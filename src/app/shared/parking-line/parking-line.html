@@ -1,0 +1,33 @@
+<ol
+  class="parking-line"
+  [class.is-horizontal]="orientation() === 'horizontal'"
+  [class.is-vertical]="orientation() === 'vertical'"
+  [class.has-reversed-cars]="reverseCars()"
+  [attr.aria-label]="label() + ' parking spaces'"
+>
+  @for (parkingSpace of spaces(); track $index) {
+    @let status = statusFor(parkingSpace);
+    <li
+      class="parking-space"
+      [class.is-available]="status === 'available'"
+      [class.is-in-use]="status === 'in-use'"
+      [class.is-offline]="status === 'offline'"
+      [class.is-loading]="status === 'loading'"
+      [class.is-non-charging]="status === 'non-charging'"
+      [attr.data-parking-space]="parkingSpace"
+      [attr.data-status]="status"
+      [attr.title]="status === 'in-use' ? carTitle(parkingSpace) : null"
+      [attr.aria-label]="spaceLabel(parkingSpace, $index)"
+    >
+      @if (status === 'in-use') {
+        <svg class="car-icon" [attr.viewBox]="carIcon().viewBox" aria-hidden="true">
+          <path fill="currentColor" [attr.d]="carIcon().path" />
+        </svg>
+      } @else if (status === 'available' && accessible()) {
+        <svg class="wheelchair-icon" [attr.viewBox]="wheelchairIcon.viewBox" aria-hidden="true">
+          <path fill="currentColor" [attr.d]="wheelchairIcon.path" />
+        </svg>
+      }
+    </li>
+  }
+</ol>

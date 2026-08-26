@@ -1,0 +1,19 @@
+{
+  "id": "./",
+  "name": "NLR EVSE Dashboard",
+  "short_name": "NLR EVSE",
+  "description": "View current EV charger availability at the National Laboratory of the Rockies.",
+  "lang": "en-US",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#003a69",
+  "theme_color": "#003a69",
+  "categories": ["utilities"],
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "favicon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}

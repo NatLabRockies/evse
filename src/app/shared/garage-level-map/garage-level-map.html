@@ -1,0 +1,7 @@
+<div
+  class="map"
+  role="img"
+  [attr.aria-label]="'Level ' + level() + ' garage map'"
+  [attr.aria-busy]="svgSource.isLoading()"
+  [innerHTML]="svgMarkup()"
+></div>

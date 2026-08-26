@@ -1,0 +1,82 @@
+<div
+  class="grid h-dvh grid-rows-[auto_minmax(0,1fr)_auto] overflow-hidden bg-[linear-gradient(180deg,#0e315e_0%,#0d5d99_100%)] text-white"
+>
+  <app-level-status-header
+    [level]="level"
+    actionLabel="View Map"
+    [actionLink]="['/level', level, 'map']"
+  />
+
+  <main
+    class="min-h-0 pt-2 pr-[calc(--spacing(3)+env(safe-area-inset-right))] pb-2 pl-[calc(--spacing(3)+env(safe-area-inset-left))]"
+  >
+    <div
+      class="mx-auto grid h-full max-w-3xl grid-rows-[minmax(6.5rem,0.8fr)_minmax(0,2.4fr)] gap-3"
+    >
+      <a
+        class="group flex min-h-0 flex-col items-center justify-center text-center"
+        [routerLink]="['/level', level, 'map']"
+        [attr.aria-label]="'Expand Level ' + level + ' garage map'"
+      >
+        <app-garage-level-map [level]="level" />
+      </a>
+
+      <section class="flex min-h-0 flex-col" aria-labelledby="parking-orientation-heading">
+        <h2 id="parking-orientation-heading" class="sr-only">Parking spaces and orientation</h2>
+
+        @if (regions.northwest; as northwest) {
+          <figure class="mb-2 shrink-0" data-region="northwest">
+            <figcaption class="mb-1 text-center text-base leading-none">
+              {{ northwest.label }}
+            </figcaption>
+            <app-parking-line
+              [label]="northwest.label"
+              [orientation]="northwest.orientation"
+              [spaces]="northwest.spaces"
+            />
+          </figure>
+        }
+
+        <div class="grid min-h-0 flex-1 grid-cols-[3.75rem_minmax(0,1fr)_3.75rem] gap-4">
+          <div class="flex items-center justify-center" aria-hidden="true">
+            <div class="grid grid-cols-3 items-center text-center text-sm leading-none font-bold">
+              <span class="col-span-3">N</span>
+              <span>W</span>
+              <svg class="-ml-1.5 size-8" viewBox="0 0 32 32" fill="currentColor">
+                <path d="m16 1 3.4 11.6L31 16l-11.6 3.4L16 31l-3.4-11.6L1 16l11.6-3.4z" />
+              </svg>
+              <span>E</span>
+              <span class="col-span-3">S</span>
+            </div>
+          </div>
+
+          <div
+            class="grid min-h-0 gap-4"
+            [class.grid-cols-1]="regions.center.length === 1"
+            [class.grid-cols-2]="regions.center.length === 2"
+          >
+            @for (region of regions.center; track region.id) {
+              <figure class="flex min-h-0 flex-col items-center" [attr.data-region]="region.id">
+                <figcaption class="mb-1 text-center text-base leading-none">
+                  {{ region.label }}
+                </figcaption>
+                <app-parking-line
+                  class="min-h-0 flex-1"
+                  [label]="region.label"
+                  [orientation]="region.orientation"
+                  [spaces]="region.spaces"
+                  [accessible]="region.accessible ?? false"
+                  [reverseCars]="region.reverseCars ?? false"
+                />
+              </figure>
+            }
+          </div>
+
+          <div data-center-balance aria-hidden="true"></div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <app-level-navigation />
+</div>

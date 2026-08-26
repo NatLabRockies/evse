@@ -1,0 +1,115 @@
+<header class="bg-white" aria-labelledby="page-title">
+  <div
+    class="mx-auto flex h-42 max-w-3xl flex-col items-start justify-between pt-[max(--spacing(14),env(safe-area-inset-top))] pr-[calc(--spacing(12)+env(safe-area-inset-right))] pl-[calc(--spacing(12)+env(safe-area-inset-left))] sm:h-52 sm:pt-[calc(--spacing(16)+env(safe-area-inset-top))] sm:pr-[calc(--spacing(9)+env(safe-area-inset-right))] sm:pl-[calc(--spacing(9)+env(safe-area-inset-left))]"
+  >
+    <img
+      class="pointer-events-none block h-9 select-none sm:h-12"
+      alt="National Laboratory of the Rockies"
+      src="nlr-logo.svg"
+    />
+
+    <h1
+      id="page-title"
+      class="mb-2.75 text-[2rem] leading-none font-bold whitespace-nowrap text-nlr-blue max-[360px]:text-[1.75rem] sm:text-[2.5rem]"
+    >
+      FIND A CHARGER
+    </h1>
+  </div>
+</header>
+
+<main
+  class="min-h-[calc(100dvh-(--spacing(42)))] bg-[linear-gradient(180deg,#0e315e_0%,#0d5d99_100%)] pt-4 pr-[calc(--spacing(5.5)+env(safe-area-inset-right))] pb-[calc(--spacing(12)+env(safe-area-inset-bottom))] pl-[calc(--spacing(5.5)+env(safe-area-inset-left))] text-white sm:min-h-[calc(100dvh-(--spacing(52)))] sm:pt-6 sm:pr-[calc(--spacing(10)+env(safe-area-inset-right))] sm:pb-[calc(--spacing(16)+env(safe-area-inset-bottom))] sm:pl-[calc(--spacing(10)+env(safe-area-inset-left))]"
+>
+  <section class="mx-auto max-w-3xl" aria-labelledby="availability-heading">
+    <h2
+      id="availability-heading"
+      class="mb-4 text-right text-2xl leading-none font-bold sm:mb-6 sm:text-3xl"
+    >
+      # Available
+    </h2>
+
+    <ul class="grid gap-4" aria-label="Available chargers by level">
+      @for (level of chargerLevels(); track level.level) {
+        <li>
+          <a
+            class="grid h-16 grid-cols-[2rem_minmax(0,1fr)] overflow-hidden rounded-lg bg-white text-nlr-blue transition-transform hover:-translate-y-0.5 focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-white active:translate-y-0 sm:h-20 sm:grid-cols-[2.5rem_minmax(0,1fr)] sm:rounded-xl"
+            [routerLink]="['/level', level.level]"
+          >
+            <span class="bg-available" aria-hidden="true"></span>
+
+            <span class="relative flex min-w-0 items-center pl-5 sm:pl-7">
+              <span
+                class="text-[2rem] leading-none font-medium max-[360px]:text-[1.75rem] sm:text-[2.5rem]"
+              >
+                {{ level.label }}
+              </span>
+
+              @if (level.accessible) {
+                <svg
+                  class="absolute right-22 size-9 text-nlr-blue min-[390px]:right-25 sm:right-22"
+                  [attr.viewBox]="wheelchairIcon.viewBox"
+                  fill="currentColor"
+                  role="img"
+                  aria-label="Accessible charging"
+                >
+                  <path fill="currentColor" [attr.d]="wheelchairIcon.path" />
+                </svg>
+              }
+
+              <strong
+                class="absolute right-8 text-right text-[2.5rem] leading-none font-black max-[390px]:right-5 sm:right-7 sm:text-[2.75rem]"
+                [attr.aria-label]="
+                  level.available === null ? 'Availability loading' : level.available + ' available'
+                "
+              >
+                {{ level.available ?? '—' }}
+              </strong>
+            </span>
+          </a>
+        </li>
+      }
+    </ul>
+
+    <p
+      class="mt-4.5 text-center text-xl leading-7 font-normal whitespace-nowrap font-condensed sm:mt-6 sm:text-2xl"
+    >
+      @if (lastUpdated(); as updated) {
+        Updated
+        <time [attr.datetime]="updated.toISOString()" [title]="updated | date: 'medium'">
+          {{ lastUpdatedRelative() }}
+        </time>
+        @if (hasError()) {
+          <span class="sr-only">The latest refresh failed. Retrying automatically.</span>
+        }
+      } @else if (hasError()) {
+        Data unavailable. Retrying&hellip;
+      } @else if (isLoading()) {
+        Loading current data&hellip;
+      }
+    </p>
+
+    <dl
+      class="mt-3.5 grid grid-cols-3 gap-3 min-[390px]:gap-8 sm:mt-5 sm:gap-8"
+      aria-label="Charger status summary"
+    >
+      @for (stat of chargerSummary(); track stat.label) {
+        <div class="overflow-hidden rounded-lg border-2 border-nlr-blue text-center sm:rounded-xl">
+          <div
+            class="h-7 sm:h-8"
+            [class.bg-available]="stat.accent === 'available'"
+            [class.bg-in-use]="stat.accent === 'in-use'"
+            [class.bg-offline]="stat.accent === 'offline'"
+            aria-hidden="true"
+          ></div>
+
+          <div class="px-1 py-3 font-condensed sm:py-4">
+            <dd class="text-4xl leading-none font-bold sm:text-[3rem]">
+              {{ stat.count ?? '—' }}
+            </dd>
+            <dt class="text-lg leading-6 font-bold sm:text-xl">Total<br />{{ stat.label }}</dt>
+          </div>
+        </div>
+      }
+    </dl>
+  </section>
+</main>

@@ -1,0 +1,99 @@
+:host {
+  --parking-space-aspect-ratio: calc(1 / 2);
+
+  display: block;
+  min-width: 0;
+  min-height: 0;
+}
+
+:host.is-horizontal {
+  width: 100%;
+  height: auto;
+}
+
+:host.is-vertical {
+  width: auto;
+  height: 100%;
+  aspect-ratio: calc(1 / var(--parking-space-aspect-ratio)) / var(--space-count);
+}
+
+.parking-line {
+  display: grid;
+  margin: 0;
+  padding: 3px;
+  gap: 2px;
+  overflow: hidden;
+  list-style: none;
+  background: var(--color-nlr-navy);
+}
+
+.is-horizontal {
+  width: 100%;
+  height: auto;
+  grid-template-columns: repeat(var(--space-count), minmax(0, 1fr));
+}
+
+.is-horizontal .parking-space {
+  aspect-ratio: var(--parking-space-aspect-ratio);
+}
+
+.is-vertical {
+  width: 100%;
+  height: 100%;
+  grid-template-rows: repeat(var(--space-count), minmax(0, 1fr));
+}
+
+.is-vertical .parking-space {
+  width: 100%;
+  height: auto;
+  align-self: center;
+  aspect-ratio: calc(1 / var(--parking-space-aspect-ratio));
+}
+
+.parking-space {
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: var(--color-nlr-blue);
+}
+
+.is-available {
+  background: var(--color-available);
+}
+
+.is-in-use {
+  background: var(--color-in-use);
+}
+
+.is-offline {
+  background: var(--color-offline);
+}
+
+.is-non-charging {
+  outline: 1px solid var(--color-nlr-navy);
+}
+
+.is-loading {
+  background: rgb(255 255 255 / 18%);
+}
+
+.car-icon {
+  display: block;
+  width: 75%;
+  height: 75%;
+  color: #231f20;
+}
+
+.has-reversed-cars .car-icon {
+  transform: rotate(180deg);
+}
+
+.wheelchair-icon {
+  display: block;
+  width: 70%;
+  height: 70%;
+  color: #003a69;
+}

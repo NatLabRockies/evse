@@ -1,0 +1,45 @@
+<nav
+  class="bg-nlr-blue pt-2 pr-[calc(--spacing(2)+env(safe-area-inset-right))] pb-[max(--spacing(2),env(safe-area-inset-bottom))] pl-[calc(--spacing(2)+env(safe-area-inset-left))]"
+  aria-label="Garage levels"
+>
+  <div class="mx-auto grid max-w-3xl grid-cols-5 gap-1.5">
+    <a
+      class="flex h-11 min-w-0 flex-col items-center justify-center rounded bg-white text-xs leading-none text-nlr-blue focus-visible:outline-3 focus-visible:outline-offset-1 focus-visible:outline-white"
+      routerLink="/"
+      routerLinkActive="is-active"
+      [routerLinkActiveOptions]="{ exact: true }"
+      ariaCurrentWhenActive="page"
+    >
+      <svg class="mb-0.5 size-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M12 3 2.5 11.2l1.3 1.5 1.7-1.5V21h5v-6h3v6h5v-9.8l1.7 1.5 1.3-1.5L12 3Z" />
+      </svg>
+      <span>Home</span>
+    </a>
+
+    @for (level of levels(); track level.level) {
+      <a
+        class="flex h-11 min-w-0 flex-col items-center justify-center rounded bg-white text-xs leading-none text-nlr-blue focus-visible:outline-3 focus-visible:outline-offset-1 focus-visible:outline-white"
+        [routerLink]="['/level', level.level]"
+        routerLinkActive="is-active"
+        ariaCurrentWhenActive="page"
+      >
+        <span class="mb-0.5 flex h-5 items-center justify-center gap-1">
+          @if (level.accessible) {
+            <svg
+              class="size-4"
+              [attr.viewBox]="wheelchairIcon.viewBox"
+              fill="currentColor"
+              aria-hidden="true"
+            >
+              <path [attr.d]="wheelchairIcon.path" />
+            </svg>
+          }
+          <strong class="level-count text-lg leading-none font-black text-available">
+            {{ level.available ?? '—' }}
+          </strong>
+        </span>
+        <span class="truncate">Level {{ level.level }}</span>
+      </a>
+    }
+  </div>
+</nav>

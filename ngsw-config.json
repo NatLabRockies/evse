@@ -1,0 +1,31 @@
+{
+  "$schema": "./node_modules/@angular/service-worker/config/schema.json",
+  "index": "/index.html",
+  "assetGroups": [
+    {
+      "name": "app-shell",
+      "installMode": "prefetch",
+      "resources": {
+        "files": [
+          "/index.html",
+          "/manifest.webmanifest",
+          "/apple-touch-icon.png",
+          "/favicon.svg",
+          "/icon-192.png",
+          "/icon-512.png",
+          "/nlr-logo.svg",
+          "/*.css",
+          "/*.js"
+        ]
+      }
+    },
+    {
+      "name": "level-maps",
+      "installMode": "prefetch",
+      "updateMode": "prefetch",
+      "resources": {
+        "files": ["/levels/*.svg"]
+      }
+    }
+  ]
+}

@@ -1,0 +1,51 @@
+<header
+  class="pt-[calc(--spacing(3)+env(safe-area-inset-top))] pr-[calc(--spacing(3)+env(safe-area-inset-right))] pb-1 pl-[calc(--spacing(3)+env(safe-area-inset-left))] text-white"
+>
+  <div class="mx-auto max-w-3xl">
+    <div class="grid grid-cols-[auto_minmax(6.5rem,1fr)_auto] items-center gap-2">
+      <h1 class="text-[clamp(1.25rem,6vw,1.625rem)] leading-none font-bold whitespace-nowrap">
+        LEVEL {{ level() }}
+      </h1>
+
+      <div
+        class="mx-auto flex min-w-0 items-center justify-center gap-2 rounded-lg bg-available px-3 py-1 text-nlr-blue"
+        [attr.aria-label]="
+          available() === null ? 'Availability loading' : available() + ' available'
+        "
+      >
+        @if (accessible()) {
+          <svg
+            class="size-6"
+            [attr.viewBox]="wheelchairIcon.viewBox"
+            fill="currentColor"
+            aria-hidden="true"
+          >
+            <path [attr.d]="wheelchairIcon.path" />
+          </svg>
+        }
+        <strong class="text-[2rem] leading-none font-black">{{ available() ?? '—' }}</strong>
+        <span class="text-[clamp(0.875rem,4vw,1.125rem)] leading-none whitespace-nowrap">
+          Available
+        </span>
+      </div>
+
+      <dl class="grid gap-0.5 text-[clamp(0.8rem,3.8vw,1rem)] leading-none">
+        <div class="flex items-center gap-1.5">
+          <dt class="order-2">In Use</dt>
+          <dd class="h-3.5 w-8 rounded bg-in-use" aria-label="Gold"></dd>
+        </div>
+        <div class="flex items-center gap-1.5">
+          <dt class="order-2">Offline</dt>
+          <dd class="h-3.5 w-8 rounded bg-offline" aria-label="Purple"></dd>
+        </div>
+      </dl>
+    </div>
+
+    <a
+      class="mt-1.5 inline-flex min-h-7 items-center rounded bg-white px-3 py-1 text-sm leading-none font-medium text-slate-950 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-white"
+      [routerLink]="actionLink()"
+    >
+      {{ actionLabel() }}
+    </a>
+  </div>
+</header>

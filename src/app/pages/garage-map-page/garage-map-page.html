@@ -1,0 +1,23 @@
+<div
+  class="grid h-[100dvh] grid-rows-[auto_minmax(0,1fr)_auto] overflow-hidden bg-[linear-gradient(180deg,#0e315e_0%,#0d5d99_100%)] text-white"
+>
+  <app-level-status-header
+    [level]="level"
+    actionLabel="View Spaces"
+    [actionLink]="['/level', level]"
+  />
+
+  <main
+    class="min-h-0 pt-2 pr-[calc(--spacing(3)+env(safe-area-inset-right))] pb-2 pl-[calc(--spacing(3)+env(safe-area-inset-left))]"
+  >
+    <div class="map-stage relative mx-auto h-full max-w-5xl overflow-hidden">
+      <div class="garage-plan-frame p-1">
+        <div class="flex h-full w-full flex-col items-center justify-center p-4 text-center">
+          <app-garage-level-map [level]="level" />
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <app-level-navigation />
+</div>

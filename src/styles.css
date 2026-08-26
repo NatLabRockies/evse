@@ -1,0 +1,34 @@
+@import '@fontsource-variable/roboto-flex/wdth.css';
+@import 'tailwindcss';
+
+@theme {
+  --color-nlr-blue: #003a69;
+  --color-nlr-navy: #052337;
+  --color-available: #4fab47;
+  --color-in-use: #db9728;
+  --color-offline: #996bae;
+}
+
+@utility font-condensed {
+  font-stretch: 70%;
+}
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    background: #0d5d99;
+  }
+
+  body {
+    min-height: 100dvh;
+    margin: 0;
+    font-family: 'Roboto Flex Variable', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+}

@@ -1,0 +1,11 @@
+:host {
+  display: block;
+}
+
+.is-active {
+  background: var(--color-available);
+}
+
+.is-active .level-count {
+  color: var(--color-nlr-navy);
+}

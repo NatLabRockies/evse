@@ -5,6 +5,7 @@ import { vi } from 'vitest'
 
 import type { EvseState } from './evse-availability.service'
 import {
+  CLOCK_INTERVAL_MS,
   EVSE_DATA_URL,
   EVSE_REFRESH_INTERVAL_MS,
   EvseAvailabilityService,
@@ -68,6 +69,26 @@ describe('EvseAvailabilityService', () => {
     expect(service.lastUpdated()?.getTime()).toBe(UPDATED_AT)
     expect(service.lastUpdatedRelative()).toBe('less than a minute ago')
     expect(service.hasError()).toBe(false)
+  })
+
+  it('updates relative time every second without fetching again', () => {
+    const service = TestBed.inject(EvseAvailabilityService)
+
+    vi.advanceTimersByTime(0)
+    httpTesting.expectOne(EVSE_DATA_URL).flush({
+      updated: UPDATED_AT,
+      stations: [],
+    })
+
+    expect(service.lastUpdatedRelative()).toBe('less than a minute ago')
+
+    vi.advanceTimersByTime(CLOCK_INTERVAL_MS)
+    httpTesting.expectNone(EVSE_DATA_URL)
+    expect(service.lastUpdatedRelative()).toBe('less than a minute ago')
+
+    vi.advanceTimersByTime(9 * CLOCK_INTERVAL_MS)
+    httpTesting.expectNone(EVSE_DATA_URL)
+    expect(service.lastUpdatedRelative()).toBe('1 minute ago')
   })
 
   it('refreshes after 60 seconds and retains the previous data on an error', () => {

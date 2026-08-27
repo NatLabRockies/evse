@@ -20,6 +20,7 @@ import { GARAGE_LEVELS, GarageLevel } from './garage-levels'
 
 export const EVSE_DATA_URL = 'https://nlr-evse.s3-us-west-2.amazonaws.com/data.json'
 export const EVSE_REFRESH_INTERVAL_MS = 60_000
+export const CLOCK_INTERVAL_MS = 1_000
 
 export type ChargerStatus = 'available' | 'in-use' | 'offline'
 type SummaryAccent = ChargerStatus
@@ -126,9 +127,18 @@ export class EvseAvailabilityService {
       .pipe(
         startWith(null),
         switchMap(() =>
+          this.document.visibilityState === 'visible' ? timer(0, CLOCK_INTERVAL_MS) : NEVER,
+        ),
+        takeUntilDestroyed(),
+      )
+      .subscribe(() => this.clockState.set(new Date()))
+
+    fromEvent(this.document, 'visibilitychange')
+      .pipe(
+        startWith(null),
+        switchMap(() =>
           this.document.visibilityState === 'visible'
             ? timer(0, EVSE_REFRESH_INTERVAL_MS).pipe(
-                tap(() => this.clockState.set(new Date())),
                 exhaustMap(() =>
                   this.fetchAvailability().pipe(
                     tap((snapshot) => {

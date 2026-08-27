@@ -1,5 +1,5 @@
 import { DatePipe } from '@angular/common'
-import { Component, inject } from '@angular/core'
+import { Component, computed, inject } from '@angular/core'
 import { RouterLink } from '@angular/router'
 
 import { EvseAvailabilityService } from '../../evse-availability.service'
@@ -15,7 +15,9 @@ export class HomePage {
   private readonly availabilityService = inject(EvseAvailabilityService)
 
   protected readonly wheelchairIcon = WHEELCHAIR_ICON
-  protected readonly chargerLevels = this.availabilityService.chargerLevels
+  protected readonly chargerLevels = computed(() =>
+    this.availabilityService.chargerLevels().toReversed(),
+  )
   protected readonly chargerSummary = this.availabilityService.chargerSummary
   protected readonly lastUpdated = this.availabilityService.lastUpdated
   protected readonly lastUpdatedRelative = this.availabilityService.lastUpdatedRelative

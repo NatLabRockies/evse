@@ -64,9 +64,15 @@ describe('App routing', () => {
 
   it('renders every home-page level as a route link', async () => {
     const compiled = await renderRoute('/')
+    const levelLinks = Array.from(compiled.querySelectorAll('a[href^="/level/"]'))
 
     expect(compiled.querySelector('h1')?.textContent).toContain('FIND A CHARGER')
-    expect(compiled.querySelectorAll('a[href^="/level/"]')).toHaveLength(4)
+    expect(levelLinks.map((link) => link.getAttribute('href'))).toEqual([
+      '/level/4',
+      '/level/3',
+      '/level/2',
+      '/level/1',
+    ])
     expect(compiled.querySelectorAll('dl > div')).toHaveLength(3)
     expect(compiled.querySelector('time')?.textContent).toContain('less than a minute ago')
   })

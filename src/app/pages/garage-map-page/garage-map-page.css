@@ -2,10 +2,6 @@
   display: block;
 }
 
-.map-stage {
-  container-type: size;
-}
-
 .garage-plan-frame {
   position: absolute;
   top: 50%;

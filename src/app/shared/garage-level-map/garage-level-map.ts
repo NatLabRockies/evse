@@ -3,7 +3,7 @@ import { Component, computed, inject, input } from '@angular/core'
 import { DomSanitizer } from '@angular/platform-browser'
 
 import { ChargerStatus, EvseAvailabilityService } from '../../evse-availability.service'
-import { GarageLevel } from '../../garage-levels'
+import { ParkingArea } from '../../garage-levels'
 
 type MapStatus = ChargerStatus | 'loading'
 
@@ -14,14 +14,14 @@ const STATUS_FILL: Readonly<Record<MapStatus, string>> = {
   loading: 'rgb(255 255 255 / 18%)',
 }
 
-const PARKING_SPACE_PATTERN = /lv\d{2}-\d{2}/i
+const PARKING_SPACE_PATTERN = /(?:^|[-_])(lv\d{2}-\d{2}|[1-8][ab])_?$/i
 
 export function applyStationStatuses(
   svgDocument: Document,
   stationStatuses: Readonly<Record<string, ChargerStatus>>,
 ): void {
   for (const element of svgDocument.querySelectorAll<SVGElement>('[id]')) {
-    const parkingSpace = element.id.match(PARKING_SPACE_PATTERN)?.[0].toUpperCase()
+    const parkingSpace = element.id.match(PARKING_SPACE_PATTERN)?.[1].toUpperCase()
     if (!parkingSpace) {
       continue
     }
@@ -34,7 +34,18 @@ export function applyStationStatuses(
       element.style.display = status === 'in-use' ? 'none' : ''
     } else if (elementId.includes('car')) {
       element.style.fill = status === 'in-use' ? '#231f20' : 'none'
-    } else if (element.tagName.toLowerCase() === 'rect') {
+      // Illustrator can put fill:none on symbol paths; let each use supply its color.
+      const reference = element.getAttribute('href') ?? element.getAttribute('xlink:href')
+      if (reference?.startsWith('#')) {
+        const symbol = svgDocument.getElementById(reference.slice(1))
+        for (const path of symbol?.querySelectorAll('path') ?? []) {
+          path.style.fill = 'inherit'
+        }
+      }
+    } else if (
+      !elementId.includes('offline') &&
+      ['rect', 'path'].includes(element.tagName.toLowerCase())
+    ) {
       element.style.fill = STATUS_FILL[status]
     }
   }
@@ -69,11 +80,14 @@ export class GarageLevelMap {
   private readonly availabilityService = inject(EvseAvailabilityService)
   private readonly sanitizer = inject(DomSanitizer)
 
-  readonly level = input.required<GarageLevel>()
+  readonly level = input.required<ParkingArea>()
 
-  protected readonly svgSource = httpResource.text(() => `levels/level-${this.level()}.svg`, {
-    defaultValue: '',
-  })
+  protected readonly svgSource = httpResource.text(
+    () => (this.level() === 'fc' ? 'levels/fc.svg' : `levels/level-${this.level()}.svg`),
+    {
+      defaultValue: '',
+    },
+  )
   protected readonly svgMarkup = computed(() =>
     this.sanitizer.bypassSecurityTrustHtml(
       renderGarageLevelSvg(this.svgSource.value(), this.availabilityService.stationStatuses()),

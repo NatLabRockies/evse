@@ -3,9 +3,11 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { signal } from '@angular/core'
 import { TestBed } from '@angular/core/testing'
 import { provideRouter, Router } from '@angular/router'
+import { vi } from 'vitest'
 
 import { App } from './app'
 import { routes } from './app.routes'
+import { CAMPUS_STORAGE_KEY } from './campus-selection.service'
 import { EvseAvailabilityService } from './evse-availability.service'
 
 const TEST_MAP_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 50">
@@ -14,8 +16,31 @@ const TEST_MAP_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 5
   <use id="_car-offline-lv21-01_" href="#_car-horizontal_" />
 </svg>`
 
+const TEST_FC_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 178 110">
+  <path id="_1a" d="M0 0h10v5H0z" />
+  <path id="4a" d="M0 5h10v5H0z" />
+</svg>`
+
+const storedValues = new Map<string, string>()
+const campusStorage: Storage = {
+  get length() {
+    return storedValues.size
+  },
+  clear: () => storedValues.clear(),
+  key: (index: number) => Array.from(storedValues.keys())[index] ?? null,
+  removeItem: (key: string) => {
+    storedValues.delete(key)
+  },
+  getItem: (key: string) => storedValues.get(key) ?? null,
+  setItem: (key: string, value: string) => {
+    storedValues.set(key, value)
+  },
+}
+
 describe('App routing', () => {
   beforeEach(async () => {
+    storedValues.clear()
+    vi.spyOn(document.defaultView!, 'localStorage', 'get').mockReturnValue(campusStorage)
     await TestBed.configureTestingModule({
       imports: [App],
       providers: [
@@ -36,7 +61,19 @@ describe('App routing', () => {
               { count: 22, label: 'In Use', accent: 'in-use' },
               { count: 44, label: 'Offline', accent: 'offline' },
             ]),
+            flatironsRegions: signal([
+              { id: 'west', label: 'West', available: 6 },
+              { id: 'east', label: 'East', available: 6 },
+            ]),
+            flatironsSummary: signal([
+              { count: 12, label: 'Available', accent: 'available' },
+              { count: 3, label: 'In Use', accent: 'in-use' },
+              { count: 0, label: 'Offline', accent: 'offline' },
+            ]),
             stationStatuses: signal({
+              '1A': 'available',
+              '1B': 'in-use',
+              '4A': 'available',
               'LV21-01': 'in-use',
               'LV22-01': 'available',
               'LV22-19': 'available',
@@ -59,6 +96,7 @@ describe('App routing', () => {
   })
 
   afterEach(() => {
+    vi.restoreAllMocks()
     TestBed.inject(HttpTestingController).verify({ ignoreCancelled: true })
   })
 
@@ -112,6 +150,64 @@ describe('App routing', () => {
     ).not.toContain('has-reversed-cars')
     expect(compiled.querySelectorAll('nav a')).toHaveLength(5)
     expect(compiled.querySelector('nav a[href="/level/2"]')?.classList).toContain('is-active')
+  })
+
+  it('switches campuses, saves the choice, and shows Flatirons availability', async () => {
+    const compiled = await renderRoute('/')
+    const buttons = Array.from(compiled.querySelectorAll<HTMLButtonElement>('.campus-tabs button'))
+    expect(buttons[0].getAttribute('aria-pressed')).toBe('true')
+
+    buttons[1].click()
+    TestBed.tick()
+
+    expect(campusStorage.getItem(CAMPUS_STORAGE_KEY)).toBe('flatirons')
+    expect(buttons[1].getAttribute('aria-pressed')).toBe('true')
+    const links = Array.from(compiled.querySelectorAll('ul a'))
+    expect(links.map((link) => link.getAttribute('href'))).toEqual(['/fc', '/fc'])
+    expect(links[0].textContent).toContain('West')
+    expect(links[1].textContent).toContain('East')
+    expect(links[0].textContent).toContain('6')
+    expect(links[1].textContent).toContain('6')
+    expect(compiled.querySelector('time')).toBeTruthy()
+
+    buttons[0].click()
+    TestBed.tick()
+    expect(campusStorage.getItem(CAMPUS_STORAGE_KEY)).toBe('golden')
+    expect(compiled.querySelectorAll('a[href^="/level/"]')).toHaveLength(4)
+  })
+
+  it('restores the saved Flatirons selection on a new visit', async () => {
+    campusStorage.setItem(CAMPUS_STORAGE_KEY, 'flatirons')
+    const compiled = await renderRoute('/')
+
+    expect(compiled.querySelectorAll('a[href="/fc"]')).toHaveLength(2)
+    expect(compiled.querySelector('button[aria-pressed="true"]')?.textContent).toContain(
+      'Flatirons',
+    )
+  })
+
+  it('renders the Flatirons lot with fifteen spaces and a single Home link', async () => {
+    const compiled = await renderRoute('/fc')
+
+    expect(compiled.querySelector('h1')?.textContent).toContain('Flatirons')
+    expect(compiled.querySelectorAll('[data-region="west"] li')).toHaveLength(8)
+    expect(compiled.querySelectorAll('[data-region="east"] li')).toHaveLength(7)
+    expect(compiled.querySelector('[data-parking-space="4A"]')).toBeTruthy()
+    expect(compiled.querySelector('[data-parking-space="4B"]')).toBeNull()
+    expect(compiled.querySelectorAll('nav a')).toHaveLength(1)
+    expect(compiled.querySelector('a[href="/fc/map"]')?.textContent).toContain('View Map')
+    expect(compiled.querySelector('app-garage-level-map #_1a')?.getAttribute('data-status')).toBe(
+      'available',
+    )
+    expect(campusStorage.getItem(CAMPUS_STORAGE_KEY)).toBe('flatirons')
+  })
+
+  it('renders the Flatirons map with a link back to its spaces', async () => {
+    const compiled = await renderRoute('/fc/map')
+
+    expect(compiled.querySelector('[aria-label="Flatirons Campus map"]')).toBeTruthy()
+    expect(compiled.querySelector('a[href="/fc"]')?.textContent).toContain('View Spaces')
+    expect(compiled.querySelectorAll('nav a')).toHaveLength(1)
   })
 
   it.each([
@@ -185,11 +281,11 @@ describe('App routing', () => {
     const mapRequests = TestBed.inject(HttpTestingController)
       .match((request) => request.url.startsWith('levels/'))
       .filter((request) => !request.cancelled)
-    if (url.startsWith('/level/')) {
+    if (url.startsWith('/level/') || url.startsWith('/fc')) {
       expect(mapRequests.length).toBeGreaterThan(0)
     }
     for (const request of mapRequests) {
-      request.flush(TEST_MAP_SVG)
+      request.flush(request.request.url === 'levels/fc.svg' ? TEST_FC_SVG : TEST_MAP_SVG)
     }
 
     await fixture.whenStable()

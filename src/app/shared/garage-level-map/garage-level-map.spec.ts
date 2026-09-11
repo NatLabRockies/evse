@@ -2,6 +2,30 @@ import { ChargerStatus } from '../../evse-availability.service'
 import { applyStationStatuses, renderGarageLevelSvg } from './garage-level-map'
 
 describe('applyStationStatuses', () => {
+  it('supports Flatirons path IDs and lets car instances supply the symbol fill', () => {
+    const svgDocument = new DOMParser().parseFromString(
+      `<svg xmlns="http://www.w3.org/2000/svg">
+        <defs><symbol id="car"><path id="car-2" style="fill:none" d="M0 0h1v1H0z" /></symbol></defs>
+        <path id="_1a" />
+        <use id="car-1a" href="#car" />
+        <path id="4a" />
+        <use id="car-4a" href="#car" />
+        <path id="lv21-01" />
+        <use id="car-lv21-01" href="#car" />
+      </svg>`,
+      'image/svg+xml',
+    )
+
+    applyStationStatuses(svgDocument, { '1A': 'in-use', '4A': 'available', 'LV21-01': 'offline' })
+
+    expect(svgDocument.getElementById('_1a')?.style.fill).toContain('--color-in-use')
+    expect(svgDocument.getElementById('4a')?.style.fill).toContain('--color-available')
+    expect(svgDocument.getElementById('car-1a')?.style.fill).toBe('rgb(35, 31, 32)')
+    expect(svgDocument.getElementById('car-4a')?.style.fill).toBe('none')
+    expect(svgDocument.getElementById('car-2')?.style.fill).toBe('inherit')
+    expect(svgDocument.getElementById('lv21-01')?.style.fill).toContain('--color-offline')
+  })
+
   it('colors spaces and shows cars using the realtime station status', () => {
     const svgDocument = new DOMParser().parseFromString(
       `<svg xmlns="http://www.w3.org/2000/svg">

@@ -1,7 +1,8 @@
 import { Component, inject } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 
-import { GarageLevel } from '../../garage-levels'
+import { CampusSelectionService } from '../../campus-selection.service'
+import { ParkingArea } from '../../garage-levels'
 import { GarageLevelMap } from '../../shared/garage-level-map/garage-level-map'
 import { LevelNavigation } from '../../shared/level-navigation/level-navigation'
 import { LevelStatusHeader } from '../../shared/level-status-header/level-status-header'
@@ -13,5 +14,10 @@ import { LevelStatusHeader } from '../../shared/level-status-header/level-status
   styleUrl: './garage-map-page.css',
 })
 export class GarageMapPage {
-  protected readonly level = inject(ActivatedRoute).snapshot.data['level'] as GarageLevel
+  protected readonly level = inject(ActivatedRoute).snapshot.data['level'] as ParkingArea
+  protected readonly spacesLink = this.level === 'fc' ? ['/fc'] : ['/level', this.level]
+
+  constructor() {
+    inject(CampusSelectionService).select(this.level === 'fc' ? 'flatirons' : 'golden')
+  }
 }

@@ -1,6 +1,6 @@
 <nav
   class="bg-nlr-blue pt-2 pr-[calc(--spacing(2)+env(safe-area-inset-right))] pb-[max(--spacing(2),env(safe-area-inset-bottom))] pl-[calc(--spacing(2)+env(safe-area-inset-left))]"
-  aria-label="Garage levels"
+  [attr.aria-label]="showLevels() ? 'Garage levels' : 'Flatirons navigation'"
 >
   <div class="mx-auto grid max-w-3xl grid-cols-5 gap-1.5">
     <a
@@ -16,7 +16,7 @@
       <span>Home</span>
     </a>
 
-    @for (level of levels(); track level.level) {
+    @for (level of showLevels() ? levels() : []; track level.level) {
       <a
         class="flex h-11 min-w-0 flex-col items-center justify-center rounded bg-white text-xs leading-none text-nlr-blue focus-visible:outline-3 focus-visible:outline-offset-1 focus-visible:outline-white"
         [routerLink]="['/level', level.level]"

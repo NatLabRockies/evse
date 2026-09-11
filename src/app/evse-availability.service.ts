@@ -16,6 +16,7 @@ import {
   timer,
 } from 'rxjs'
 
+import { FLATIRONS_REGIONS } from './flatirons'
 import { GARAGE_LEVELS, GarageLevel } from './garage-levels'
 
 export const EVSE_DATA_URL = 'https://nlr-evse.s3-us-west-2.amazonaws.com/data.json'
@@ -31,6 +32,12 @@ export interface ChargerLevel {
   readonly label: string
   readonly available: number | null
   readonly accessible?: boolean
+}
+
+export interface ChargerRegion {
+  readonly id: string
+  readonly label: string
+  readonly available: number | null
 }
 
 export interface ChargerSummary {
@@ -54,6 +61,8 @@ interface DashboardData {
 interface AvailabilitySnapshot {
   readonly levels: readonly ChargerLevel[]
   readonly summary: readonly ChargerSummary[]
+  readonly flatironsRegions: readonly ChargerRegion[]
+  readonly flatironsSummary: readonly ChargerSummary[]
   readonly stationStatuses: Readonly<Record<string, ChargerStatus>>
   readonly sessionStartTimes: Readonly<Record<string, number>>
   readonly updatedAt: Date
@@ -87,6 +96,15 @@ const initialSummary = (): readonly ChargerSummary[] => [
   { count: null, label: 'Offline', accent: 'offline' },
 ]
 
+const initialFlatironsRegions = (): readonly ChargerRegion[] =>
+  FLATIRONS_REGIONS.map(({ id, label }) => ({ id, label, available: null }))
+
+const STATUS_PRIORITY: Readonly<Record<ChargerStatus, number>> = {
+  offline: 0,
+  available: 1,
+  'in-use': 2,
+}
+
 @Injectable({ providedIn: 'root' })
 export class EvseAvailabilityService {
   private readonly document = inject(DOCUMENT)
@@ -94,6 +112,8 @@ export class EvseAvailabilityService {
 
   private readonly levelsState = signal(initialLevels())
   private readonly summaryState = signal(initialSummary())
+  private readonly flatironsRegionsState = signal(initialFlatironsRegions())
+  private readonly flatironsSummaryState = signal(initialSummary())
   private readonly stationStatusesState = signal<Readonly<Record<string, ChargerStatus>>>({})
   private readonly sessionStartTimesState = signal<Readonly<Record<string, number>>>({})
   private readonly lastUpdatedState = signal<Date | null>(null)
@@ -103,6 +123,8 @@ export class EvseAvailabilityService {
 
   readonly chargerLevels = this.levelsState.asReadonly()
   readonly chargerSummary = this.summaryState.asReadonly()
+  readonly flatironsRegions = this.flatironsRegionsState.asReadonly()
+  readonly flatironsSummary = this.flatironsSummaryState.asReadonly()
   readonly stationStatuses = this.stationStatusesState.asReadonly()
   readonly sessionStartTimes = this.sessionStartTimesState.asReadonly()
   readonly currentTime = this.clockState.asReadonly()
@@ -144,6 +166,8 @@ export class EvseAvailabilityService {
                     tap((snapshot) => {
                       this.levelsState.set(snapshot.levels)
                       this.summaryState.set(snapshot.summary)
+                      this.flatironsRegionsState.set(snapshot.flatironsRegions)
+                      this.flatironsSummaryState.set(snapshot.flatironsSummary)
                       this.stationStatusesState.set(snapshot.stationStatuses)
                       this.sessionStartTimesState.set(snapshot.sessionStartTimes)
                       this.lastUpdatedState.set(snapshot.updatedAt)
@@ -182,9 +206,8 @@ export class EvseAvailabilityService {
     const stations = new Map<
       string,
       {
-        level: GarageLevel
-        state: string
-        online: boolean
+        area: GarageLevel | 'fc'
+        status: ChargerStatus
         sessionStartTime: number | null
       }
     >()
@@ -196,17 +219,31 @@ export class EvseAvailabilityService {
       }
 
       const stationName = parkingSpace.split('-', 1)[0]
-      const level = PARKING_SPACE_FLOOR_OVERRIDES[parkingSpace] ?? STATION_FLOORS[stationName]
-      if (!level) {
+      const area: GarageLevel | 'fc' | undefined = /^[1-8][AB]$/.test(parkingSpace)
+        ? 'fc'
+        : (PARKING_SPACE_FLOOR_OVERRIDES[parkingSpace] ?? STATION_FLOORS[stationName])
+      if (!area) {
         continue
       }
 
-      stations.set(parkingSpace, {
-        level,
-        state: station.evse_state?.trim() ?? 'unknown',
-        online: station.online,
+      // 4A and 4B serve the same physical parking space. If either is occupied,
+      // the shared space is occupied; otherwise an available connector wins over offline.
+      const displaySpace = parkingSpace === '4B' ? '4A' : parkingSpace
+      const candidate = {
+        area,
+        status: this.classifyState(station.evse_state?.trim() ?? 'unknown', station.online),
         sessionStartTime: station.session_start_time,
-      })
+      }
+      const current = stations.get(displaySpace)
+      if (
+        !current ||
+        STATUS_PRIORITY[candidate.status] > STATUS_PRIORITY[current.status] ||
+        (candidate.status === current.status &&
+          current.sessionStartTime === null &&
+          candidate.sessionStartTime !== null)
+      ) {
+        stations.set(displaySpace, candidate)
+      }
     }
 
     const availableByLevel = new Map<GarageLevel, number>(GARAGE_LEVELS.map((level) => [level, 0]))
@@ -215,11 +252,16 @@ export class EvseAvailabilityService {
       'in-use': 0,
       offline: 0,
     }
+    const flatironsTotals: Record<SummaryAccent, number> = {
+      available: 0,
+      'in-use': 0,
+      offline: 0,
+    }
     const stationStatuses: Record<string, ChargerStatus> = {}
     const sessionStartTimes: Record<string, number> = {}
 
     for (const [parkingSpace, station] of stations) {
-      const status = this.classifyState(station.state, station.online)
+      const status = station.status
       stationStatuses[parkingSpace] = status
       if (
         typeof station.sessionStartTime === 'number' &&
@@ -227,10 +269,13 @@ export class EvseAvailabilityService {
       ) {
         sessionStartTimes[parkingSpace] = station.sessionStartTime
       }
-      totals[status] += 1
-
-      if (status === 'available') {
-        availableByLevel.set(station.level, (availableByLevel.get(station.level) ?? 0) + 1)
+      if (station.area === 'fc') {
+        flatironsTotals[status] += 1
+      } else {
+        totals[status] += 1
+        if (status === 'available') {
+          availableByLevel.set(station.area, (availableByLevel.get(station.area) ?? 0) + 1)
+        }
       }
     }
 
@@ -245,6 +290,16 @@ export class EvseAvailabilityService {
         { count: totals.available, label: 'Available', accent: 'available' },
         { count: totals['in-use'], label: 'In Use', accent: 'in-use' },
         { count: totals.offline, label: 'Offline', accent: 'offline' },
+      ],
+      flatironsRegions: FLATIRONS_REGIONS.map(({ id, label, spaces }) => ({
+        id,
+        label,
+        available: spaces.filter((space) => stationStatuses[space] === 'available').length,
+      })),
+      flatironsSummary: [
+        { count: flatironsTotals.available, label: 'Available', accent: 'available' },
+        { count: flatironsTotals['in-use'], label: 'In Use', accent: 'in-use' },
+        { count: flatironsTotals.offline, label: 'Offline', accent: 'offline' },
       ],
       stationStatuses,
       sessionStartTimes,

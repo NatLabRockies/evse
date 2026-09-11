@@ -4,7 +4,7 @@
   <div class="mx-auto max-w-3xl">
     <div class="grid grid-cols-[auto_minmax(6.5rem,1fr)_auto] items-center gap-2">
       <h1 class="text-[clamp(1.25rem,6vw,1.625rem)] leading-none font-bold whitespace-nowrap">
-        LEVEL {{ level() }}
+        {{ level() === 'fc' ? 'Flatirons' : 'LEVEL ' + level() }}
       </h1>
 
       <div

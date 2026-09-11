@@ -1,7 +1,9 @@
 import { Component, inject } from '@angular/core'
 import { ActivatedRoute, RouterLink } from '@angular/router'
 
-import { GarageLevel } from '../../garage-levels'
+import { CampusSelectionService } from '../../campus-selection.service'
+import { FLATIRONS_REGIONS } from '../../flatirons'
+import { ParkingArea } from '../../garage-levels'
 import { GarageLevelMap } from '../../shared/garage-level-map/garage-level-map'
 import { LevelNavigation } from '../../shared/level-navigation/level-navigation'
 import {
@@ -11,7 +13,7 @@ import {
 } from '../../shared/parking-line/parking-line'
 import { LevelStatusHeader } from '../../shared/level-status-header/level-status-header'
 
-type RegionId = 'northwest' | 'center-west' | 'center-east'
+type RegionId = 'northwest' | 'center-west' | 'center-east' | 'west' | 'east'
 
 interface ParkingRegion {
   readonly id: RegionId
@@ -45,10 +47,13 @@ const region = (
   orientation,
   spaces,
   accessible,
-  reverseCars: id === 'center-west',
+  reverseCars: id === 'center-west' || id === 'east',
 })
 
-const LEVEL_REGIONS: Readonly<Record<GarageLevel, LevelRegions>> = {
+const LEVEL_REGIONS: Readonly<Record<ParkingArea, LevelRegions>> = {
+  fc: {
+    center: FLATIRONS_REGIONS.map(({ id, label, spaces }) => region(id, label, 'vertical', spaces)),
+  },
   1: {
     center: [region('center-east', 'Center East', 'vertical', chargerSpaces('LV11', 16))],
   },
@@ -83,6 +88,13 @@ const LEVEL_REGIONS: Readonly<Record<GarageLevel, LevelRegions>> = {
   styleUrl: './level-page.css',
 })
 export class LevelPage {
-  protected readonly level: GarageLevel = inject(ActivatedRoute).snapshot.data['level']
+  protected readonly level: ParkingArea = inject(ActivatedRoute).snapshot.data['level']
   protected readonly regions = LEVEL_REGIONS[this.level]
+  protected readonly mapLink = this.level === 'fc' ? ['/fc', 'map'] : ['/level', this.level, 'map']
+  protected readonly mapLabel =
+    this.level === 'fc' ? 'Flatirons Campus map' : `Level ${this.level} garage map`
+
+  constructor() {
+    inject(CampusSelectionService).select(this.level === 'fc' ? 'flatirons' : 'golden')
+  }
 }

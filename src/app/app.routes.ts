@@ -12,6 +12,18 @@ export const routes: Routes = [
     component: HomePage,
     title: 'Find a Charger | NLR EVSE',
   },
+  {
+    path: 'fc',
+    component: LevelPage,
+    data: { level: 'fc' },
+    title: 'Flatirons Campus | NLR EVSE',
+  },
+  {
+    path: 'fc/map',
+    component: GarageMapPage,
+    data: { level: 'fc' },
+    title: 'Flatirons Campus Map | NLR EVSE',
+  },
   ...GARAGE_LEVELS.flatMap((level) => [
     {
       path: `level/${level}`,

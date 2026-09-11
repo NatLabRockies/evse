@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core'
+import { Component, inject, input } from '@angular/core'
 import { RouterLink, RouterLinkActive } from '@angular/router'
 
 import { EvseAvailabilityService } from '../../evse-availability.service'
@@ -11,6 +11,7 @@ import { WHEELCHAIR_ICON } from '../icons'
   styleUrl: './level-navigation.css',
 })
 export class LevelNavigation {
+  readonly showLevels = input(true)
   private readonly availabilityService = inject(EvseAvailabilityService)
 
   protected readonly levels = this.availabilityService.chargerLevels

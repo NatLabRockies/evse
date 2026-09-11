@@ -1,4 +1,4 @@
-<header class="bg-white" aria-labelledby="page-title">
+<header class="h-52 bg-white sm:h-62" aria-labelledby="page-title">
   <div
     class="mx-auto flex h-42 max-w-3xl flex-col items-start justify-between pt-[max(--spacing(14),env(safe-area-inset-top))] pr-[calc(--spacing(12)+env(safe-area-inset-right))] pl-[calc(--spacing(12)+env(safe-area-inset-left))] sm:h-52 sm:pt-[calc(--spacing(16)+env(safe-area-inset-top))] sm:pr-[calc(--spacing(9)+env(safe-area-inset-right))] sm:pl-[calc(--spacing(9)+env(safe-area-inset-left))]"
   >
@@ -15,10 +15,34 @@
       FIND A CHARGER
     </h1>
   </div>
+  <div
+    class="campus-tabs mx-auto flex h-10 max-w-3xl pr-[calc(--spacing(5.5)+env(safe-area-inset-right))] pl-[calc(--spacing(5.5)+env(safe-area-inset-left))] sm:pr-[calc(--spacing(10)+env(safe-area-inset-right))] sm:pl-[calc(--spacing(10)+env(safe-area-inset-left))]"
+    role="group"
+    aria-label="Campus"
+  >
+    <button
+      class="flex flex-1 cursor-pointer items-center justify-center rounded-t px-3 text-2xl leading-[1.2] font-bold focus-visible:z-1 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-nlr-blue"
+      [class]="campus() === 'golden' ? 'bg-[#0e315e] text-white' : 'bg-[#d9d9d9] text-nlr-blue'"
+      type="button"
+      [attr.aria-pressed]="campus() === 'golden'"
+      (click)="campusSelection.select('golden')"
+    >
+      Golden
+    </button>
+    <button
+      class="flex flex-1 cursor-pointer items-center justify-center rounded-t px-3 text-2xl leading-[1.2] font-bold focus-visible:z-1 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-nlr-blue"
+      [class]="campus() === 'flatirons' ? 'bg-[#0e315e] text-white' : 'bg-[#d9d9d9] text-nlr-blue'"
+      type="button"
+      [attr.aria-pressed]="campus() === 'flatirons'"
+      (click)="campusSelection.select('flatirons')"
+    >
+      Flatirons
+    </button>
+  </div>
 </header>
 
 <main
-  class="min-h-[calc(100dvh-(--spacing(42)))] bg-[linear-gradient(180deg,#0e315e_0%,#0d5d99_100%)] pt-4 pr-[calc(--spacing(5.5)+env(safe-area-inset-right))] pb-[calc(--spacing(12)+env(safe-area-inset-bottom))] pl-[calc(--spacing(5.5)+env(safe-area-inset-left))] text-white sm:min-h-[calc(100dvh-(--spacing(52)))] sm:pt-6 sm:pr-[calc(--spacing(10)+env(safe-area-inset-right))] sm:pb-[calc(--spacing(16)+env(safe-area-inset-bottom))] sm:pl-[calc(--spacing(10)+env(safe-area-inset-left))]"
+  class="min-h-[calc(100dvh-(--spacing(52)))] bg-[linear-gradient(180deg,#0e315e_0%,#0d5d99_100%)] pt-4 pr-[calc(--spacing(5.5)+env(safe-area-inset-right))] pb-[calc(--spacing(12)+env(safe-area-inset-bottom))] pl-[calc(--spacing(5.5)+env(safe-area-inset-left))] text-white sm:min-h-[calc(100dvh-(--spacing(62)))] sm:pt-6 sm:pr-[calc(--spacing(10)+env(safe-area-inset-right))] sm:pb-[calc(--spacing(16)+env(safe-area-inset-bottom))] sm:pl-[calc(--spacing(10)+env(safe-area-inset-left))]"
 >
   <section class="mx-auto max-w-3xl" aria-labelledby="availability-heading">
     <h2
@@ -28,12 +52,12 @@
       # Available
     </h2>
 
-    <ul class="grid gap-4" aria-label="Available chargers by level">
-      @for (level of chargerLevels(); track level.level) {
+    <ul class="grid gap-4" [attr.aria-label]="'Available chargers at ' + campus()">
+      @for (level of destinations(); track level.id) {
         <li>
           <a
             class="grid h-16 grid-cols-[2rem_minmax(0,1fr)] overflow-hidden rounded-lg bg-white text-nlr-blue transition-transform hover:-translate-y-0.5 focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-white active:translate-y-0 sm:h-20 sm:grid-cols-[2.5rem_minmax(0,1fr)] sm:rounded-xl"
-            [routerLink]="['/level', level.level]"
+            [routerLink]="level.link"
           >
             <span class="bg-available" aria-hidden="true"></span>
 

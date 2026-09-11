@@ -1,7 +1,7 @@
 <div
-  class="map"
+  class="h-full w-full pointer-events-none"
   role="img"
-  [attr.aria-label]="'Level ' + level() + ' garage map'"
+  [attr.aria-label]="level() === 'fc' ? 'Flatirons Campus map' : 'Level ' + level() + ' garage map'"
   [attr.aria-busy]="svgSource.isLoading()"
   [innerHTML]="svgMarkup()"
 ></div>

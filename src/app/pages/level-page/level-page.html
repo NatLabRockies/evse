@@ -1,11 +1,7 @@
 <div
   class="grid h-dvh grid-rows-[auto_minmax(0,1fr)_auto] overflow-hidden bg-[linear-gradient(180deg,#0e315e_0%,#0d5d99_100%)] text-white"
 >
-  <app-level-status-header
-    [level]="level"
-    actionLabel="View Map"
-    [actionLink]="['/level', level, 'map']"
-  />
+  <app-level-status-header [level]="level" actionLabel="View Map" [actionLink]="mapLink" />
 
   <main
     class="min-h-0 pt-2 pr-[calc(--spacing(3)+env(safe-area-inset-right))] pb-2 pl-[calc(--spacing(3)+env(safe-area-inset-left))]"
@@ -15,8 +11,8 @@
     >
       <a
         class="group flex min-h-0 flex-col items-center justify-center text-center"
-        [routerLink]="['/level', level, 'map']"
-        [attr.aria-label]="'Expand Level ' + level + ' garage map'"
+        [routerLink]="mapLink"
+        [attr.aria-label]="'Expand ' + mapLabel"
       >
         <app-garage-level-map [level]="level" />
       </a>
@@ -67,6 +63,7 @@
                   [spaces]="region.spaces"
                   [accessible]="region.accessible ?? false"
                   [reverseCars]="region.reverseCars ?? false"
+                  [style.max-height]="level === 'fc' && region.id === 'east' ? '87.5%' : null"
                 />
               </figure>
             }
@@ -78,5 +75,5 @@
     </div>
   </main>
 
-  <app-level-navigation />
+  <app-level-navigation [showLevels]="level !== 'fc'" />
 </div>

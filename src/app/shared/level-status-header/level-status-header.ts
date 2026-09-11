@@ -2,7 +2,7 @@ import { Component, computed, inject, input } from '@angular/core'
 import { RouterLink } from '@angular/router'
 
 import { EvseAvailabilityService } from '../../evse-availability.service'
-import { GarageLevel } from '../../garage-levels'
+import { ParkingArea } from '../../garage-levels'
 import { WHEELCHAIR_ICON } from '../icons'
 
 @Component({
@@ -11,7 +11,7 @@ import { WHEELCHAIR_ICON } from '../icons'
   templateUrl: './level-status-header.html',
 })
 export class LevelStatusHeader {
-  readonly level = input.required<GarageLevel>()
+  readonly level = input.required<ParkingArea>()
   readonly actionLabel = input.required<string>()
   readonly actionLink = input.required<readonly (string | number)[]>()
 
@@ -19,11 +19,19 @@ export class LevelStatusHeader {
 
   protected readonly wheelchairIcon = WHEELCHAIR_ICON
 
-  protected readonly available = computed(
-    () =>
+  protected readonly available = computed(() => {
+    if (this.level() === 'fc') {
+      return (
+        this.availabilityService.flatironsSummary().find((item) => item.accent === 'available')
+          ?.count ?? null
+      )
+    }
+
+    return (
       this.availabilityService.chargerLevels().find((item) => item.level === this.level())
-        ?.available ?? null,
-  )
+        ?.available ?? null
+    )
+  })
 
   protected readonly accessible = computed(
     () =>

@@ -31,6 +31,7 @@ export interface ChargerLevel {
   readonly level: GarageLevel
   readonly label: string
   readonly available: number | null
+  readonly accent: SummaryAccent | null
   readonly accessible?: boolean
 }
 
@@ -38,6 +39,7 @@ export interface ChargerRegion {
   readonly id: string
   readonly label: string
   readonly available: number | null
+  readonly accent: SummaryAccent | null
 }
 
 export interface ChargerSummary {
@@ -87,6 +89,7 @@ const initialLevels = (): readonly ChargerLevel[] =>
     level,
     label: `Level ${level}`,
     available: null,
+    accent: null,
     accessible: level === 3,
   }))
 
@@ -97,7 +100,28 @@ const initialSummary = (): readonly ChargerSummary[] => [
 ]
 
 const initialFlatironsRegions = (): readonly ChargerRegion[] =>
-  FLATIRONS_REGIONS.map(({ id, label }) => ({ id, label, available: null }))
+  FLATIRONS_REGIONS.map(({ id, label }) => ({ id, label, available: null, accent: null }))
+
+type StatusCounts = Record<SummaryAccent, number>
+
+const emptyStatusCounts = (): StatusCounts => ({
+  available: 0,
+  'in-use': 0,
+  offline: 0,
+})
+
+const accentFor = (counts: StatusCounts): SummaryAccent | null => {
+  if (counts.available > 0) {
+    return 'available'
+  }
+
+  const total = counts['in-use'] + counts.offline
+  if (total === 0) {
+    return null
+  }
+
+  return counts.offline === total ? 'offline' : 'in-use'
+}
 
 const STATUS_PRIORITY: Readonly<Record<ChargerStatus, number>> = {
   offline: 0,
@@ -246,17 +270,11 @@ export class EvseAvailabilityService {
       }
     }
 
-    const availableByLevel = new Map<GarageLevel, number>(GARAGE_LEVELS.map((level) => [level, 0]))
-    const totals: Record<SummaryAccent, number> = {
-      available: 0,
-      'in-use': 0,
-      offline: 0,
-    }
-    const flatironsTotals: Record<SummaryAccent, number> = {
-      available: 0,
-      'in-use': 0,
-      offline: 0,
-    }
+    const totalsByLevel = new Map<GarageLevel, StatusCounts>(
+      GARAGE_LEVELS.map((level) => [level, emptyStatusCounts()]),
+    )
+    const totals = emptyStatusCounts()
+    const flatironsTotals = emptyStatusCounts()
     const stationStatuses: Record<string, ChargerStatus> = {}
     const sessionStartTimes: Record<string, number> = {}
 
@@ -273,29 +291,42 @@ export class EvseAvailabilityService {
         flatironsTotals[status] += 1
       } else {
         totals[status] += 1
-        if (status === 'available') {
-          availableByLevel.set(station.area, (availableByLevel.get(station.area) ?? 0) + 1)
-        }
+        totalsByLevel.get(station.area)![status] += 1
       }
     }
 
     return {
-      levels: GARAGE_LEVELS.map((level) => ({
-        level,
-        label: `Level ${level}`,
-        available: availableByLevel.get(level) ?? 0,
-        accessible: level === 3,
-      })),
+      levels: GARAGE_LEVELS.map((level) => {
+        const counts = totalsByLevel.get(level)!
+        return {
+          level,
+          label: `Level ${level}`,
+          available: counts.available,
+          accent: accentFor(counts),
+          accessible: level === 3,
+        }
+      }),
       summary: [
         { count: totals.available, label: 'Available', accent: 'available' },
         { count: totals['in-use'], label: 'In Use', accent: 'in-use' },
         { count: totals.offline, label: 'Offline', accent: 'offline' },
       ],
-      flatironsRegions: FLATIRONS_REGIONS.map(({ id, label, spaces }) => ({
-        id,
-        label,
-        available: spaces.filter((space) => stationStatuses[space] === 'available').length,
-      })),
+      flatironsRegions: FLATIRONS_REGIONS.map(({ id, label, spaces }) => {
+        const counts = emptyStatusCounts()
+        for (const space of spaces) {
+          const status = stationStatuses[space]
+          if (status) {
+            counts[status] += 1
+          }
+        }
+
+        return {
+          id,
+          label,
+          available: counts.available,
+          accent: accentFor(counts),
+        }
+      }),
       flatironsSummary: [
         { count: flatironsTotals.available, label: 'Available', accent: 'available' },
         { count: flatironsTotals['in-use'], label: 'In Use', accent: 'in-use' },

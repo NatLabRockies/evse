@@ -59,7 +59,18 @@
             class="grid h-16 grid-cols-[2rem_minmax(0,1fr)] overflow-hidden rounded-lg bg-white text-nlr-blue transition-transform hover:-translate-y-0.5 focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-white active:translate-y-0 sm:h-20 sm:grid-cols-[2.5rem_minmax(0,1fr)] sm:rounded-xl"
             [routerLink]="level.link"
           >
-            <span class="bg-available" aria-hidden="true"></span>
+            <span
+              [class]="
+                level.accent === 'available'
+                  ? 'bg-available'
+                  : level.accent === 'offline'
+                    ? 'bg-offline'
+                    : level.accent === 'in-use'
+                      ? 'bg-in-use'
+                      : 'bg-white/20'
+              "
+              aria-hidden="true"
+            ></span>
 
             <span class="relative flex min-w-0 items-center pl-5 sm:pl-7">
               <span

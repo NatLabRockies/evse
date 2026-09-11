@@ -51,10 +51,16 @@ describe('App routing', () => {
           provide: EvseAvailabilityService,
           useValue: {
             chargerLevels: signal([
-              { level: 1, label: 'Level 1', available: 5 },
-              { level: 2, label: 'Level 2', available: 14 },
-              { level: 3, label: 'Level 3', available: 2, accessible: true },
-              { level: 4, label: 'Level 4', available: 0 },
+              { level: 1, label: 'Level 1', available: 5, accent: 'available' },
+              { level: 2, label: 'Level 2', available: 14, accent: 'available' },
+              {
+                level: 3,
+                label: 'Level 3',
+                available: 2,
+                accent: 'available',
+                accessible: true,
+              },
+              { level: 4, label: 'Level 4', available: 0, accent: 'offline' },
             ]),
             chargerSummary: signal([
               { count: 34, label: 'Available', accent: 'available' },
@@ -62,8 +68,8 @@ describe('App routing', () => {
               { count: 44, label: 'Offline', accent: 'offline' },
             ]),
             flatironsRegions: signal([
-              { id: 'west', label: 'West', available: 6 },
-              { id: 'east', label: 'East', available: 6 },
+              { id: 'west', label: 'West', available: 6, accent: 'available' },
+              { id: 'east', label: 'East', available: 6, accent: 'available' },
             ]),
             flatironsSummary: signal([
               { count: 12, label: 'Available', accent: 'available' },

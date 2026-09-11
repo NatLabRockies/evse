@@ -32,6 +32,7 @@ export class HomePage {
           id: region.id,
           label: region.label,
           available: region.available,
+          accent: region.accent,
           accessible: false,
           link: ['/fc'],
         })),

@@ -10,7 +10,6 @@ permissions:
 
 concurrency:
   group: pages
-  cancel-in-progress: false
 
 jobs:
   build:
@@ -29,7 +28,6 @@ jobs:
         with:
           node-version: 26
           cache: pnpm
-          cache-dependency-path: pnpm-lock.yaml
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -38,16 +36,13 @@ jobs:
         run: pnpm lint
 
       - name: Run tests
-        run: pnpm exec ng test --watch=false
+        run: pnpm test
 
       - name: Build production UI
         run: pnpm build
 
       - name: Create SPA fallback
         run: cp dist/evse-dashboard/browser/index.html dist/evse-dashboard/browser/404.html
-
-      - name: Configure GitHub Pages
-        uses: actions/configure-pages@v6
 
       - name: Upload GitHub Pages artifact
         uses: actions/upload-pages-artifact@v5
@@ -59,7 +54,6 @@ jobs:
     needs: build
     runs-on: ubuntu-22.04
     permissions:
-      contents: read
       pages: write
       id-token: write
     environment:

@@ -1,6 +1,7 @@
 # NLR EVSE Dashboard
 
-Real-time EV charger availability for the National Laboratory of the Rockies:
+Real-time EV charger availability for the National Laboratory of the Rockies' South Table
+Mountain (STM) and Flatirons campuses.
 
 ## Run
 
@@ -15,10 +16,12 @@ pnpm start
 
 The Angular 22/Tailwind 4 interface:
 
-- Queries EVSE data every 60 seconds and shows availability for garage levels 1–4.
-- Summarizes available, in-use, and offline chargers; an online `Ready` charger is available.
-- Shows accessible charging, loading/error states, and the relative last-update time.
-- Provides a responsive, production service-worker-enabled interface.
+- Loads live EVSE data from S3 every 60 seconds and immediately when the app regains focus.
+- Remembers the selected STM or Flatirons campus and summarizes available, in-use, and offline
+  chargers.
+- Provides responsive space and map views for STM garage levels 1–4 and the Flatirons lot,
+  including accessible charging, and elapsed charging time.
+- Supports installation as an iOS web app and caches application assets with a service worker.
 
 ## Development
 

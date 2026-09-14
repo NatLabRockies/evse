@@ -20,7 +20,7 @@ describe('applyStationStatuses', () => {
 
     expect(svgDocument.getElementById('_1a')?.style.fill).toContain('--color-in-use')
     expect(svgDocument.getElementById('4a')?.style.fill).toContain('--color-available')
-    expect(svgDocument.getElementById('car-1a')?.style.fill).toBe('rgb(35, 31, 32)')
+    expect(svgDocument.getElementById('car-1a')?.style.fill).toBe('#231f20')
     expect(svgDocument.getElementById('car-4a')?.style.fill).toBe('none')
     expect(svgDocument.getElementById('car-2')?.style.fill).toBe('inherit')
     expect(svgDocument.getElementById('lv21-01')?.style.fill).toContain('--color-offline')
@@ -50,7 +50,7 @@ describe('applyStationStatuses', () => {
       '--color-in-use',
     )
     expect(svgDocument.getElementById('_car-offline-lv21-01_')?.getAttribute('style')).toContain(
-      'rgb(35, 31, 32)',
+      '#231f20',
     )
     expect(svgDocument.getElementById('_lv21-02_')?.getAttribute('style')).toContain(
       '--color-available',
@@ -59,7 +59,7 @@ describe('applyStationStatuses', () => {
       'none',
     )
     expect(svgDocument.getElementById('_lv21-03_')?.getAttribute('style')).toContain(
-      'rgba(255, 255, 255, 0.18)',
+      'rgb(255 255 255 / 18%)',
     )
   })
 

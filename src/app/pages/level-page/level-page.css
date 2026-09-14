@@ -53,7 +53,7 @@
 @media (orientation: landscape) and (max-height: 40rem) {
   .level-page-shell {
     height: auto;
-    min-height: 100dvh;
+    min-height: var(--app-height);
     grid-template-rows: auto auto auto;
     overflow: visible;
   }

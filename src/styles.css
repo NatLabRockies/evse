@@ -14,6 +14,7 @@
 }
 
 :root {
+  --app-height: 100dvh;
   --offline-cross-image:
     linear-gradient(
       to bottom right,
@@ -29,6 +30,12 @@
     );
 }
 
+@media (display-mode: standalone) {
+  :root {
+    --app-height: 100lvh;
+  }
+}
+
 @layer base {
   *,
   *::before,
@@ -41,7 +48,7 @@
   }
 
   body {
-    min-height: 100dvh;
+    min-height: var(--app-height);
     margin: 0;
     font-family: 'Roboto Flex Variable', sans-serif;
     -webkit-font-smoothing: antialiased;

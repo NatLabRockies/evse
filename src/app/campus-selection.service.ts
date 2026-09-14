@@ -1,7 +1,7 @@
 import { DOCUMENT } from '@angular/common'
 import { Injectable, inject, signal } from '@angular/core'
 
-export type Campus = 'golden' | 'flatirons'
+export type Campus = 'stm' | 'flatirons'
 export const CAMPUS_STORAGE_KEY = 'evse-campus'
 
 @Injectable({ providedIn: 'root' })
@@ -26,8 +26,8 @@ export class CampusSelectionService {
         return 'flatirons'
       }
     } catch {
-      // Default to Golden when storage is unavailable.
+      // Default to STM when storage is unavailable.
     }
-    return 'golden'
+    return 'stm'
   }
 }

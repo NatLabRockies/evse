@@ -4,6 +4,7 @@ import { RouterLink } from '@angular/router'
 
 import { CampusSelectionService } from '../../campus-selection.service'
 import { EvseAvailabilityService } from '../../evse-availability.service'
+import { accentColors } from '../../shared/accent'
 import { WHEELCHAIR_ICON } from '../../shared/icons'
 
 @Component({
@@ -18,8 +19,9 @@ export class HomePage {
   protected readonly campus = this.campusSelection.campus
 
   protected readonly wheelchairIcon = WHEELCHAIR_ICON
+  protected readonly accentColors = accentColors
   protected readonly destinations = computed(() =>
-    this.campus() === 'golden'
+    this.campus() === 'stm'
       ? this.availabilityService
           .chargerLevels()
           .toReversed()
@@ -38,7 +40,7 @@ export class HomePage {
         })),
   )
   protected readonly chargerSummary = computed(() =>
-    this.campus() === 'golden'
+    this.campus() === 'stm'
       ? this.availabilityService.chargerSummary()
       : this.availabilityService.flatironsSummary(),
   )

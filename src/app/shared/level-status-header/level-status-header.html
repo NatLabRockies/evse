@@ -1,3 +1,6 @@
+@let currentStatus = status();
+@let colors = accentColors(currentStatus.accent);
+
 <header
   class="pt-[calc(--spacing(3)+env(safe-area-inset-top))] pr-[calc(--spacing(3)+env(safe-area-inset-right))] pb-1 pl-[calc(--spacing(3)+env(safe-area-inset-left))] text-white"
 >
@@ -8,12 +11,16 @@
       </h1>
 
       <div
-        class="mx-auto flex min-w-0 items-center justify-center gap-2 rounded-lg bg-available px-3 py-1 text-nlr-blue"
+        class="mx-auto flex min-w-0 items-center justify-center gap-2 rounded-lg px-3 py-1"
+        [style.background-color]="colors.background"
+        [style.color]="colors.foreground"
         [attr.aria-label]="
-          available() === null ? 'Availability loading' : available() + ' available'
+          currentStatus.available === null
+            ? 'Availability loading'
+            : currentStatus.available + ' available'
         "
       >
-        @if (accessible()) {
+        @if (currentStatus.accessible) {
           <svg
             class="size-6"
             [attr.viewBox]="wheelchairIcon.viewBox"
@@ -23,7 +30,9 @@
             <path [attr.d]="wheelchairIcon.path" />
           </svg>
         }
-        <strong class="text-[2rem] leading-none font-black">{{ available() ?? '—' }}</strong>
+        <strong class="text-[2rem] leading-none font-black">
+          {{ currentStatus.available ?? '—' }}
+        </strong>
         <span class="text-[clamp(0.875rem,4vw,1.125rem)] leading-none whitespace-nowrap">
           Available
         </span>

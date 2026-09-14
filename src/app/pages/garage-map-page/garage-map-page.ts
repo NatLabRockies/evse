@@ -18,6 +18,6 @@ export class GarageMapPage {
   protected readonly spacesLink = this.level === 'fc' ? ['/fc'] : ['/level', this.level]
 
   constructor() {
-    inject(CampusSelectionService).select(this.level === 'fc' ? 'flatirons' : 'golden')
+    inject(CampusSelectionService).select(this.level === 'fc' ? 'flatirons' : 'stm')
   }
 }

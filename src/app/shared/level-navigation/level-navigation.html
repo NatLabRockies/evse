@@ -17,9 +17,12 @@
     </a>
 
     @for (level of showLevels() ? levels() : []; track level.level) {
+      @let colors = accentColors(level.accent);
       <a
         class="flex h-11 min-w-0 flex-col items-center justify-center rounded bg-white text-xs leading-none text-nlr-blue focus-visible:outline-3 focus-visible:outline-offset-1 focus-visible:outline-white"
-        [routerLink]="['/level', level.level]"
+        [routerLink]="mapView() ? ['/level', level.level, 'map'] : ['/level', level.level]"
+        [style.--active-background]="colors.background"
+        [style.--active-foreground]="colors.foreground"
         routerLinkActive="is-active"
         ariaCurrentWhenActive="page"
       >

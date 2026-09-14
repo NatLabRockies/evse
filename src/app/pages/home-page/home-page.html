@@ -22,12 +22,12 @@
   >
     <button
       class="flex flex-1 cursor-pointer items-center justify-center rounded-t px-3 text-2xl leading-[1.2] font-bold focus-visible:z-1 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-nlr-blue"
-      [class]="campus() === 'golden' ? 'bg-[#0e315e] text-white' : 'bg-[#d9d9d9] text-nlr-blue'"
+      [class]="campus() === 'stm' ? 'bg-[#0e315e] text-white' : 'bg-[#d9d9d9] text-nlr-blue'"
       type="button"
-      [attr.aria-pressed]="campus() === 'golden'"
-      (click)="campusSelection.select('golden')"
+      [attr.aria-pressed]="campus() === 'stm'"
+      (click)="campusSelection.select('stm')"
     >
-      Golden
+      STM
     </button>
     <button
       class="flex flex-1 cursor-pointer items-center justify-center rounded-t px-3 text-2xl leading-[1.2] font-bold focus-visible:z-1 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-nlr-blue"
@@ -60,15 +60,7 @@
             [routerLink]="level.link"
           >
             <span
-              [class]="
-                level.accent === 'available'
-                  ? 'bg-available'
-                  : level.accent === 'offline'
-                    ? 'bg-offline'
-                    : level.accent === 'in-use'
-                      ? 'bg-in-use'
-                      : 'bg-white/20'
-              "
+              [style.background-color]="accentColors(level.accent).background"
               aria-hidden="true"
             ></span>
 

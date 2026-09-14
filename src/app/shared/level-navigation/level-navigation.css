@@ -3,9 +3,10 @@
 }
 
 .is-active {
-  background: var(--color-available);
+  background: var(--active-background, var(--color-available));
+  color: var(--active-foreground, var(--color-nlr-navy));
 }
 
 .is-active .level-count {
-  color: var(--color-nlr-navy);
+  color: inherit;
 }

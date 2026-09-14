@@ -76,6 +76,7 @@ describe('App routing', () => {
               { count: 3, label: 'In Use', accent: 'in-use' },
               { count: 0, label: 'Offline', accent: 'offline' },
             ]),
+            flatironsStatus: signal({ available: 12, accent: 'available' }),
             stationStatuses: signal({
               '1A': 'available',
               '1B': 'in-use',
@@ -178,7 +179,7 @@ describe('App routing', () => {
 
     buttons[0].click()
     TestBed.tick()
-    expect(campusStorage.getItem(CAMPUS_STORAGE_KEY)).toBe('golden')
+    expect(campusStorage.getItem(CAMPUS_STORAGE_KEY)).toBe('stm')
     expect(compiled.querySelectorAll('a[href^="/level/"]')).toHaveLength(4)
   })
 
@@ -273,7 +274,10 @@ describe('App routing', () => {
     expect(compiled.querySelector('h1')?.textContent).toContain('LEVEL 3')
     expect(compiled.querySelector('[role="img"][aria-label="Level 3 garage map"]')).toBeTruthy()
     expect(compiled.querySelector('a[href="/level/3"]')?.textContent).toContain('View Spaces')
-    expect(compiled.querySelector('nav a[href="/level/3"]')?.classList).toContain('is-active')
+    expect(compiled.querySelector('nav a[href="/level/3/map"]')?.classList).toContain('is-active')
+    expect(
+      Array.from(compiled.querySelectorAll('nav a')).map((link) => link.getAttribute('href')),
+    ).toEqual(['/', '/level/1/map', '/level/2/map', '/level/3/map', '/level/4/map'])
   })
 
   async function renderRoute(url: string): Promise<HTMLElement> {

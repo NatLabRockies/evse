@@ -149,6 +149,23 @@ export class EvseAvailabilityService {
   readonly chargerSummary = this.summaryState.asReadonly()
   readonly flatironsRegions = this.flatironsRegionsState.asReadonly()
   readonly flatironsSummary = this.flatironsSummaryState.asReadonly()
+  readonly flatironsStatus = computed(() => {
+    const summary = this.flatironsSummaryState()
+    const countFor = (accent: SummaryAccent): number | null =>
+      summary.find((item) => item.accent === accent)?.count ?? null
+    const available = countFor('available')
+    const inUse = countFor('in-use')
+    const offline = countFor('offline')
+
+    if (available === null || inUse === null || offline === null) {
+      return { available: null, accent: null }
+    }
+
+    return {
+      available,
+      accent: accentFor({ available, 'in-use': inUse, offline }),
+    }
+  })
   readonly stationStatuses = this.stationStatusesState.asReadonly()
   readonly sessionStartTimes = this.sessionStartTimesState.asReadonly()
   readonly currentTime = this.clockState.asReadonly()

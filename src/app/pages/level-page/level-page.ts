@@ -95,6 +95,6 @@ export class LevelPage {
     this.level === 'fc' ? 'Flatirons Campus map' : `Level ${this.level} garage map`
 
   constructor() {
-    inject(CampusSelectionService).select(this.level === 'fc' ? 'flatirons' : 'golden')
+    inject(CampusSelectionService).select(this.level === 'fc' ? 'flatirons' : 'stm')
   }
 }

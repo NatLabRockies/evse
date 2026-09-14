@@ -3,6 +3,7 @@ import { RouterLink } from '@angular/router'
 
 import { EvseAvailabilityService } from '../../evse-availability.service'
 import { ParkingArea } from '../../garage-levels'
+import { accentColors } from '../accent'
 import { WHEELCHAIR_ICON } from '../icons'
 
 @Component({
@@ -18,24 +19,20 @@ export class LevelStatusHeader {
   private readonly availabilityService = inject(EvseAvailabilityService)
 
   protected readonly wheelchairIcon = WHEELCHAIR_ICON
+  protected readonly accentColors = accentColors
 
-  protected readonly available = computed(() => {
-    if (this.level() === 'fc') {
-      return (
-        this.availabilityService.flatironsSummary().find((item) => item.accent === 'available')
-          ?.count ?? null
-      )
+  protected readonly status = computed(() => {
+    const level = this.level()
+    if (level === 'fc') {
+      return { ...this.availabilityService.flatironsStatus(), accessible: false }
     }
 
     return (
-      this.availabilityService.chargerLevels().find((item) => item.level === this.level())
-        ?.available ?? null
+      this.availabilityService.chargerLevels().find((item) => item.level === level) ?? {
+        available: null,
+        accent: null,
+        accessible: false,
+      }
     )
   })
-
-  protected readonly accessible = computed(
-    () =>
-      this.availabilityService.chargerLevels().find((item) => item.level === this.level())
-        ?.accessible ?? null,
-  )
 }

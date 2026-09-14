@@ -17,51 +17,60 @@
         <app-garage-level-map [level]="level" />
       </a>
 
-      <section class="flex min-h-0 flex-col" aria-labelledby="parking-orientation-heading">
+      <section
+        class="parking-layout-container flex min-h-0 flex-col"
+        aria-labelledby="parking-orientation-heading"
+      >
         <h2 id="parking-orientation-heading" class="sr-only">Parking spaces and orientation</h2>
 
-        @if (regions.northwest; as northwest) {
-          <figure class="mb-2 shrink-0" data-region="northwest">
-            <figcaption class="mb-1 text-center text-base leading-none">
-              {{ northwest.label }}
-            </figcaption>
-            <app-parking-line
-              [label]="northwest.label"
-              [orientation]="northwest.orientation"
-              [spaces]="northwest.spaces"
-            />
-          </figure>
-        }
+        <div
+          class="parking-layout flex min-h-0 flex-1 flex-col"
+          [class.has-horizontal-line]="horizontalSpaceCount > 0"
+          [style.--vertical-space-count]="verticalSpaceCount"
+          [style.--horizontal-space-count]="horizontalSpaceCount"
+          [style.--center-column-count]="centerColumnCount"
+        >
+          @if (regions.northwest; as northwest) {
+            <figure class="mb-2 flex shrink-0 flex-col items-center" data-region="northwest">
+              <figcaption class="mb-1 text-center text-base leading-none">
+                {{ northwest.label }}
+              </figcaption>
+              <app-parking-line
+                [label]="northwest.label"
+                [orientation]="northwest.orientation"
+                [spaces]="northwest.spaces"
+              />
+            </figure>
+          }
 
-        <div class="grid min-h-0 flex-1 grid-cols-[3.75rem_minmax(0,1fr)_3.75rem] gap-4">
-          <div class="flex items-center justify-center" aria-hidden="true">
-            <app-compass-rose class="rounded-lg bg-nlr-navy/80 p-1 shadow-sm" />
+          <div class="grid min-h-0 flex-1 grid-cols-[3.75rem_minmax(0,1fr)_3.75rem] gap-4">
+            <div class="flex items-center justify-center" aria-hidden="true">
+              <app-compass-rose class="rounded-lg bg-nlr-navy/80 p-1 shadow-sm" />
+            </div>
+
+            <div
+              class="grid min-h-0 gap-4"
+              [class.grid-cols-1]="regions.center.length === 1"
+              [class.grid-cols-2]="regions.center.length === 2"
+            >
+              @for (region of regions.center; track region.id) {
+                <figure class="flex min-h-0 flex-col items-center" [attr.data-region]="region.id">
+                  <figcaption class="mb-1 text-center text-base leading-none">
+                    {{ region.label }}
+                  </figcaption>
+                  <app-parking-line
+                    [label]="region.label"
+                    [orientation]="region.orientation"
+                    [spaces]="region.spaces"
+                    [accessible]="region.accessible ?? false"
+                    [reverseCars]="region.reverseCars ?? false"
+                  />
+                </figure>
+              }
+            </div>
+
+            <div data-center-balance aria-hidden="true"></div>
           </div>
-
-          <div
-            class="grid min-h-0 gap-4"
-            [class.grid-cols-1]="regions.center.length === 1"
-            [class.grid-cols-2]="regions.center.length === 2"
-          >
-            @for (region of regions.center; track region.id) {
-              <figure class="flex min-h-0 flex-col items-center" [attr.data-region]="region.id">
-                <figcaption class="mb-1 text-center text-base leading-none">
-                  {{ region.label }}
-                </figcaption>
-                <app-parking-line
-                  class="min-h-0 flex-1"
-                  [label]="region.label"
-                  [orientation]="region.orientation"
-                  [spaces]="region.spaces"
-                  [accessible]="region.accessible ?? false"
-                  [reverseCars]="region.reverseCars ?? false"
-                  [style.max-height]="level === 'fc' && region.id === 'east' ? '87.5%' : null"
-                />
-              </figure>
-            }
-          </div>
-
-          <div data-center-balance aria-hidden="true"></div>
         </div>
       </section>
     </div>

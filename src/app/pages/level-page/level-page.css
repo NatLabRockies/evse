@@ -1,3 +1,51 @@
 :host {
   display: block;
 }
+
+.parking-layout-container {
+  container-type: size;
+}
+
+.parking-layout {
+  --parking-space-aspect-ratio: calc(1 / 2);
+  --parking-line-gap: 2px;
+  --parking-line-padding: 3px;
+  --horizontal-space-depth: 0;
+  --horizontal-fixed-height: 0px;
+  --space-size-from-horizontal-width: 100cqw;
+  --center-column-width: calc(
+    (100cqw - 9.5rem - (var(--center-column-count) - 1) * 1rem) / var(--center-column-count)
+  );
+  --space-size-from-center-width: calc(
+    (var(--center-column-width) - 2 * var(--parking-line-padding)) *
+      var(--parking-space-aspect-ratio)
+  );
+  --vertical-fixed-height: calc(
+    1.25rem + 2 * var(--parking-line-padding) + (var(--vertical-space-count) - 1) *
+      var(--parking-line-gap)
+  );
+  --space-size-from-height: calc(
+    (100cqh - var(--vertical-fixed-height) - var(--horizontal-fixed-height)) /
+      (var(--vertical-space-count) + var(--horizontal-space-depth))
+  );
+  --parking-space-short-side: max(
+    1px,
+    min(
+      var(--space-size-from-horizontal-width),
+      var(--space-size-from-center-width),
+      var(--space-size-from-height)
+    )
+  );
+}
+
+.parking-layout.has-horizontal-line {
+  --horizontal-space-depth: calc(1 / var(--parking-space-aspect-ratio));
+  --horizontal-fixed-height: calc(1.75rem + 2 * var(--parking-line-padding));
+  --space-size-from-horizontal-width: calc(
+    (
+        100cqw - 2 * var(--parking-line-padding) - (var(--horizontal-space-count) - 1) *
+          var(--parking-line-gap)
+      ) /
+      var(--horizontal-space-count)
+  );
+}

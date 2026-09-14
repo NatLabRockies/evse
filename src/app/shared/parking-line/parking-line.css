@@ -1,5 +1,7 @@
 :host {
-  --parking-space-aspect-ratio: calc(1 / 2);
+  --parking-space-long-side: calc(
+    var(--parking-space-short-side, 2.5rem) / var(--parking-space-aspect-ratio, calc(1 / 2))
+  );
 
   display: block;
   min-width: 0;
@@ -7,47 +9,41 @@
 }
 
 :host.is-horizontal {
-  width: 100%;
-  height: auto;
+  width: calc(
+    var(--space-count) * var(--parking-space-short-side, 2.5rem) + (var(--space-count) - 1) *
+      var(--parking-line-gap, 2px) + 2 * var(--parking-line-padding, 3px)
+  );
+  height: calc(var(--parking-space-long-side) + 2 * var(--parking-line-padding, 3px));
 }
 
 :host.is-vertical {
-  width: auto;
-  height: 100%;
-  aspect-ratio: calc(1 / var(--parking-space-aspect-ratio)) / var(--space-count);
+  width: calc(var(--parking-space-long-side) + 2 * var(--parking-line-padding, 3px));
+  height: calc(
+    var(--space-count) * var(--parking-space-short-side, 2.5rem) + (var(--space-count) - 1) *
+      var(--parking-line-gap, 2px) + 2 * var(--parking-line-padding, 3px)
+  );
 }
 
 .parking-line {
   display: grid;
+  width: 100%;
+  height: 100%;
   margin: 0;
-  padding: 3px;
-  gap: 2px;
+  padding: var(--parking-line-padding, 3px);
+  gap: var(--parking-line-gap, 2px);
   overflow: hidden;
   list-style: none;
   background: var(--color-nlr-navy);
 }
 
 .is-horizontal {
-  width: 100%;
-  height: auto;
-  grid-template-columns: repeat(var(--space-count), minmax(0, 1fr));
-}
-
-.is-horizontal .parking-space {
-  aspect-ratio: var(--parking-space-aspect-ratio);
+  grid-template-columns: repeat(var(--space-count), var(--parking-space-short-side, 2.5rem));
+  grid-template-rows: var(--parking-space-long-side);
 }
 
 .is-vertical {
-  width: 100%;
-  height: 100%;
-  grid-template-rows: repeat(var(--space-count), minmax(0, 1fr));
-}
-
-.is-vertical .parking-space {
-  width: 100%;
-  height: auto;
-  align-self: center;
-  aspect-ratio: calc(1 / var(--parking-space-aspect-ratio));
+  grid-template-columns: var(--parking-space-long-side);
+  grid-template-rows: repeat(var(--space-count), var(--parking-space-short-side, 2.5rem));
 }
 
 .parking-space {

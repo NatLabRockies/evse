@@ -98,6 +98,11 @@ const LEVEL_REGIONS: Readonly<Record<ParkingArea, LevelRegions>> = {
 export class LevelPage {
   protected readonly level: ParkingArea = inject(ActivatedRoute).snapshot.data['level']
   protected readonly regions = LEVEL_REGIONS[this.level]
+  protected readonly verticalSpaceCount = Math.max(
+    ...this.regions.center.map(({ spaces }) => spaces.length),
+  )
+  protected readonly horizontalSpaceCount = this.regions.northwest?.spaces.length ?? 0
+  protected readonly centerColumnCount = this.regions.center.length
   protected readonly mapLink = this.level === 'fc' ? ['/fc', 'map'] : ['/level', this.level, 'map']
   protected readonly mapLabel =
     this.level === 'fc' ? 'Flatirons Campus map' : `Level ${this.level} garage map`

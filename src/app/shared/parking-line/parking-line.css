@@ -1,6 +1,6 @@
 :host {
   --parking-space-long-side: calc(
-    var(--parking-space-short-side, 2.5rem) / var(--parking-space-aspect-ratio, calc(1 / 2))
+    var(--parking-space-short-side, 2.5rem) / var(--parking-space-aspect-ratio)
   );
 
   display: block;

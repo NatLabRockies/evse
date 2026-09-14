@@ -1,4 +1,4 @@
 span {
   rotate: var(--compass-label-rotation, 0deg);
-  transition: rotate var(--map-rotation-transition, 180ms ease);
+  transition: rotate var(--map-rotation-transition);
 }

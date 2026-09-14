@@ -8,13 +8,53 @@ import { GarageLevelSvgService } from './garage-level-svg.service'
 type MapStatus = ChargerStatus | 'loading'
 
 const STATUS_FILL: Readonly<Record<MapStatus, string>> = {
-  available: 'var(--color-available, #4fab47)',
-  'in-use': 'var(--color-in-use, #db9728)',
-  offline: 'var(--color-offline, #996bae)',
+  available: 'var(--color-available)',
+  'in-use': 'var(--color-in-use)',
+  offline: 'var(--color-offline)',
   loading: 'rgb(255 255 255 / 18%)',
 }
 
 const PARKING_SPACE_PATTERN = /(?:^|[-_])(lv\d{2}-\d{2}|[1-8][ab])_?$/i
+const SVG_NAMESPACE = 'http://www.w3.org/2000/svg'
+const OFFLINE_PATTERN_ID = 'evse-dashboard-offline-cross'
+
+function offlinePatternFill(svgDocument: Document): string {
+  if (!svgDocument.getElementById(OFFLINE_PATTERN_ID)) {
+    const svg = svgDocument.querySelector('svg')
+    if (!svg) {
+      return STATUS_FILL.offline
+    }
+
+    let definitions = svg.querySelector('defs')
+    if (!definitions) {
+      definitions = svgDocument.createElementNS(SVG_NAMESPACE, 'defs')
+      svg.prepend(definitions)
+    }
+
+    const pattern = svgDocument.createElementNS(SVG_NAMESPACE, 'pattern')
+    pattern.id = OFFLINE_PATTERN_ID
+    pattern.setAttribute('width', '1')
+    pattern.setAttribute('height', '1')
+    pattern.setAttribute('patternUnits', 'objectBoundingBox')
+    pattern.setAttribute('patternContentUnits', 'objectBoundingBox')
+
+    const background = svgDocument.createElementNS(SVG_NAMESPACE, 'rect')
+    background.setAttribute('width', '1')
+    background.setAttribute('height', '1')
+    background.setAttribute('fill', STATUS_FILL.offline)
+
+    const cross = svgDocument.createElementNS(SVG_NAMESPACE, 'path')
+    cross.setAttribute('d', 'M0 0L1 1M1 0L0 1')
+    cross.setAttribute('fill', 'none')
+    cross.setAttribute('stroke', 'var(--color-nlr-navy)')
+    cross.setAttribute('stroke-width', '0.04')
+
+    pattern.append(background, cross)
+    definitions.append(pattern)
+  }
+
+  return `url(#${OFFLINE_PATTERN_ID})`
+}
 
 export function applyStationStatuses(
   svgDocument: Document,
@@ -46,7 +86,8 @@ export function applyStationStatuses(
       !elementId.includes('offline') &&
       ['rect', 'path'].includes(element.tagName.toLowerCase())
     ) {
-      element.style.fill = STATUS_FILL[status]
+      element.style.fill =
+        status === 'offline' ? offlinePatternFill(svgDocument) : STATUS_FILL[status]
     }
   }
 }

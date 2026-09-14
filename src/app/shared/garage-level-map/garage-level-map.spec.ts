@@ -23,7 +23,12 @@ describe('applyStationStatuses', () => {
     expect(svgDocument.getElementById('car-1a')?.style.fill).toBe('#231f20')
     expect(svgDocument.getElementById('car-4a')?.style.fill).toBe('none')
     expect(svgDocument.getElementById('car-2')?.style.fill).toBe('inherit')
-    expect(svgDocument.getElementById('lv21-01')?.style.fill).toContain('--color-offline')
+    expect(svgDocument.getElementById('lv21-01')?.style.fill).toBe(
+      'url(#evse-dashboard-offline-cross)',
+    )
+    const offlinePattern = svgDocument.getElementById('evse-dashboard-offline-cross')
+    expect(offlinePattern?.querySelector('rect')?.getAttribute('fill')).toContain('--color-offline')
+    expect(offlinePattern?.querySelector('path')?.getAttribute('d')).toBe('M0 0L1 1M1 0L0 1')
   })
 
   it('colors spaces and shows cars using the realtime station status', () => {

@@ -273,6 +273,7 @@ describe('App routing', () => {
 
     expect(compiled.querySelector('h1')?.textContent).toContain('LEVEL 3')
     expect(compiled.querySelector('[role="img"][aria-label="Level 3 garage map"]')).toBeTruthy()
+    expect(compiled.querySelector('.garage-plan-frame > app-compass-rose')).toBeTruthy()
     expect(compiled.querySelector('a[href="/level/3"]')?.textContent).toContain('View Spaces')
     expect(compiled.querySelector('nav a[href="/level/3/map"]')?.classList).toContain('is-active')
     expect(

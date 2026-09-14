@@ -4,6 +4,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router'
 import { CampusSelectionService } from '../../campus-selection.service'
 import { FLATIRONS_REGIONS } from '../../flatirons'
 import { ParkingArea } from '../../garage-levels'
+import { CompassRose } from '../../shared/compass-rose/compass-rose'
 import { GarageLevelMap } from '../../shared/garage-level-map/garage-level-map'
 import { LevelNavigation } from '../../shared/level-navigation/level-navigation'
 import {
@@ -83,7 +84,14 @@ const LEVEL_REGIONS: Readonly<Record<ParkingArea, LevelRegions>> = {
 
 @Component({
   selector: 'app-level-page',
-  imports: [GarageLevelMap, LevelNavigation, LevelStatusHeader, ParkingLine, RouterLink],
+  imports: [
+    CompassRose,
+    GarageLevelMap,
+    LevelNavigation,
+    LevelStatusHeader,
+    ParkingLine,
+    RouterLink,
+  ],
   templateUrl: './level-page.html',
   styleUrl: './level-page.css',
 })

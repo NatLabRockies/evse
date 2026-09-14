@@ -65,7 +65,8 @@
 }
 
 .is-offline {
-  background: var(--color-offline);
+  background-color: var(--color-offline);
+  background-image: var(--offline-cross-image);
 }
 
 .is-non-charging {

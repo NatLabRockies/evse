@@ -1,9 +1,9 @@
-import { httpResource } from '@angular/common/http'
 import { Component, computed, inject, input } from '@angular/core'
 import { DomSanitizer } from '@angular/platform-browser'
 
 import { ChargerStatus, EvseAvailabilityService } from '../../evse-availability.service'
 import { ParkingArea } from '../../garage-levels'
+import { GarageLevelSvgService } from './garage-level-svg.service'
 
 type MapStatus = ChargerStatus | 'loading'
 
@@ -78,19 +78,16 @@ export function renderGarageLevelSvg(
 })
 export class GarageLevelMap {
   private readonly availabilityService = inject(EvseAvailabilityService)
+  private readonly svgService = inject(GarageLevelSvgService)
   private readonly sanitizer = inject(DomSanitizer)
 
   readonly level = input.required<ParkingArea>()
 
-  protected readonly svgSource = httpResource.text(
-    () => (this.level() === 'fc' ? 'levels/fc.svg' : `levels/level-${this.level()}.svg`),
-    {
-      defaultValue: '',
-    },
-  )
+  protected readonly svgSource = computed(() => this.svgService.sourceFor(this.level()))
+  protected readonly svgLoading = computed(() => this.svgService.isLoading(this.level()))
   protected readonly svgMarkup = computed(() =>
     this.sanitizer.bypassSecurityTrustHtml(
-      renderGarageLevelSvg(this.svgSource.value(), this.availabilityService.stationStatuses()),
+      renderGarageLevelSvg(this.svgSource(), this.availabilityService.stationStatuses()),
     ),
   )
 }

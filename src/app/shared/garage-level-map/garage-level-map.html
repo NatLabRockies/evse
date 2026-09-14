@@ -2,6 +2,6 @@
   class="pointer-events-none size-full"
   role="img"
   [attr.aria-label]="level() === 'fc' ? 'Flatirons Campus map' : 'Level ' + level() + ' garage map'"
-  [attr.aria-busy]="svgSource.isLoading()"
+  [attr.aria-busy]="svgLoading()"
   [innerHTML]="svgMarkup()"
 ></div>

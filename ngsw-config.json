@@ -21,7 +21,7 @@
     },
     {
       "name": "level-maps",
-      "installMode": "prefetch",
+      "installMode": "lazy",
       "updateMode": "prefetch",
       "resources": {
         "files": ["/levels/*.svg"]

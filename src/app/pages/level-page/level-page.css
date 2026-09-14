@@ -49,3 +49,30 @@
       var(--horizontal-space-count)
   );
 }
+
+@media (orientation: landscape) and (max-height: 40rem) {
+  .level-page-shell {
+    height: auto;
+    min-height: 100dvh;
+    grid-template-rows: auto auto auto;
+    overflow: visible;
+  }
+
+  .level-content-grid {
+    height: auto;
+    grid-template-rows: 16rem auto;
+  }
+
+  .parking-layout-container {
+    container-type: inline-size;
+  }
+
+  .parking-layout {
+    --space-size-from-height: 4rem;
+    flex: none;
+  }
+
+  .center-region-grid {
+    flex: none;
+  }
+}

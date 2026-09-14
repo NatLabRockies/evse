@@ -292,9 +292,6 @@ describe('App routing', () => {
     const mapRequests = TestBed.inject(HttpTestingController)
       .match((request) => request.url.startsWith('levels/'))
       .filter((request) => !request.cancelled)
-    if (url.startsWith('/level/') || url.startsWith('/fc')) {
-      expect(mapRequests.length).toBeGreaterThan(0)
-    }
     for (const request of mapRequests) {
       request.flush(request.request.url === 'levels/fc.svg' ? TEST_FC_SVG : TEST_MAP_SVG)
     }

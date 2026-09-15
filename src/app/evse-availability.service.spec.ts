@@ -50,7 +50,8 @@ describe('EvseAvailabilityService', () => {
         station('LV22-20', 'Stopped'),
         station('LV31-01', 'unknown', false),
         station('LV32-01', 'Ready'),
-        station('LV32-01', 'Ready'),
+        station('LV32-17', 'Ready'),
+        station('LV32-18', 'Charging'),
         station('UNMAPPED-01', 'Ready'),
         station('LV31-02', 'Ready', false),
         station('LV31-03', 'unknown'),
@@ -59,12 +60,14 @@ describe('EvseAvailabilityService', () => {
     })
 
     expect(service.chargerLevels().map((level) => level.available)).toEqual([1, 1, 1, 1])
-    expect(service.chargerSummary().map((summary) => summary.count)).toEqual([4, 3, 2])
+    expect(service.chargerSummary().map((summary) => summary.count)).toEqual([4, 4, 2])
     expect(service.stationStatuses()).toMatchObject({
       'LV11-01': 'available',
       'LV21-01': 'in-use',
       'LV31-01': 'offline',
+      'LV32-17': 'in-use',
     })
+    expect(service.stationStatuses()['LV32-18']).toBeUndefined()
     expect(service.sessionStartTimes()).toEqual({ 'LV21-01': UPDATED_AT - 3_760_000 })
     expect(service.lastUpdated()?.getTime()).toBe(UPDATED_AT)
     expect(service.lastUpdatedRelative()).toBe('less than a minute ago')

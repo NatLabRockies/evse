@@ -18,6 +18,7 @@ import {
 
 import { FLATIRONS_REGIONS } from './flatirons'
 import { GARAGE_LEVELS, GarageLevel } from './garage-levels'
+import { displayParkingSpace } from './parking-spaces'
 
 export const EVSE_DATA_URL = 'https://nlr-evse.s3-us-west-2.amazonaws.com/data.json'
 export const EVSE_REFRESH_INTERVAL_MS = 60_000
@@ -267,9 +268,7 @@ export class EvseAvailabilityService {
         continue
       }
 
-      // 4A and 4B serve the same physical parking space. If either is occupied,
-      // the shared space is occupied; otherwise an available connector wins over offline.
-      const displaySpace = parkingSpace === '4B' ? '4A' : parkingSpace
+      const displaySpace = displayParkingSpace(parkingSpace)
       const candidate = {
         area,
         status: this.classifyState(station.evse_state?.trim() ?? 'unknown', station.online),

@@ -56,7 +56,12 @@ const LEVEL_REGIONS: Readonly<Record<ParkingArea, LevelRegions>> = {
     center: FLATIRONS_REGIONS.map(({ id, label, spaces }) => region(id, label, 'vertical', spaces)),
   },
   1: {
-    center: [region('center-east', 'Center East', 'vertical', chargerSpaces('LV11', 16))],
+    center: [
+      region('center-east', 'Center East', 'vertical', [
+        ...chargerSpaces('LV11', 16),
+        ...nonChargingSpaces(1),
+      ]),
+    ],
   },
   2: {
     northwest: region('northwest', 'Northwest', 'horizontal', chargerSpaces('LV23', 18)),
@@ -67,16 +72,16 @@ const LEVEL_REGIONS: Readonly<Record<ParkingArea, LevelRegions>> = {
   },
   3: {
     center: [
-      region('center-west', 'Center West', 'vertical', [...nonChargingSpaces(12), 'LV22-20'], true),
-      region('center-east', 'Center East', 'vertical', [...nonChargingSpaces(12), 'LV22-19'], true),
+      region('center-west', 'Center West', 'vertical', [...nonChargingSpaces(13), 'LV22-20'], true),
+      region('center-east', 'Center East', 'vertical', [...nonChargingSpaces(13), 'LV22-19'], true),
     ],
   },
   4: {
     center: [
-      region('center-west', 'Center West', 'vertical', chargerSpaces('LV32', 18)),
+      region('center-west', 'Center West', 'vertical', chargerSpaces('LV32', 17)),
       region('center-east', 'Center East', 'vertical', [
         ...chargerSpaces('LV31', 10),
-        ...nonChargingSpaces(8),
+        ...nonChargingSpaces(7),
       ]),
     ],
   },

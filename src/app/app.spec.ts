@@ -218,10 +218,10 @@ describe('App routing', () => {
   })
 
   it.each([
-    { level: 1, regions: ['center-east'], spaceCounts: [16] },
+    { level: 1, regions: ['center-east'], spaceCounts: [17] },
     { level: 2, regions: ['northwest', 'center-west', 'center-east'], spaceCounts: [18, 18, 18] },
-    { level: 3, regions: ['center-west', 'center-east'], spaceCounts: [13, 13] },
-    { level: 4, regions: ['center-west', 'center-east'], spaceCounts: [18, 18] },
+    { level: 3, regions: ['center-west', 'center-east'], spaceCounts: [14, 14] },
+    { level: 4, regions: ['center-west', 'center-east'], spaceCounts: [17, 17] },
   ])(
     'renders only the configured regions and spaces on level $level',
     async ({ level, regions, spaceCounts }) => {
@@ -248,11 +248,11 @@ describe('App routing', () => {
   })
 
   it.each([
-    { level: 1, region: 'center-east', first: 'LV11-01', lastCharger: 'LV11-16', last: 'LV11-16' },
+    { level: 1, region: 'center-east', first: 'LV11-01', lastCharger: 'LV11-16', last: null },
     { level: 2, region: 'northwest', first: 'LV23-01', lastCharger: 'LV23-18', last: 'LV23-18' },
     { level: 3, region: 'center-west', first: null, lastCharger: 'LV22-20', last: 'LV22-20' },
     { level: 3, region: 'center-east', first: null, lastCharger: 'LV22-19', last: 'LV22-19' },
-    { level: 4, region: 'center-west', first: 'LV32-01', lastCharger: 'LV32-18', last: 'LV32-18' },
+    { level: 4, region: 'center-west', first: 'LV32-01', lastCharger: 'LV32-17', last: 'LV32-17' },
     { level: 4, region: 'center-east', first: 'LV31-01', lastCharger: 'LV31-10', last: null },
   ])(
     'orders level $level $region spaces correctly',

@@ -3,6 +3,7 @@
 
 @theme {
   --color-nlr-blue: #003a69;
+  --color-nlr-deep-blue: #0e315e;
   --color-nlr-navy: #052337;
   --color-available: #4fab47;
   --color-in-use: #ffd54f;
@@ -12,6 +13,8 @@
 @utility font-condensed {
   font-stretch: 70%;
 }
+
+@custom-variant standalone (@media (display-mode: standalone));
 
 :root {
   --app-height: 100dvh;
@@ -30,12 +33,6 @@
     );
 }
 
-@media (display-mode: standalone) {
-  :root {
-    --app-height: 100lvh;
-  }
-}
-
 @layer base {
   *,
   *::before,
@@ -44,7 +41,11 @@
   }
 
   html {
-    background: #0d5d99;
+    background: var(--color-nlr-deep-blue);
+  }
+
+  html:has(app-home-page) {
+    background: #fff;
   }
 
   body {

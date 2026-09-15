@@ -1,6 +1,6 @@
-<header class="h-52 bg-white sm:h-62" aria-labelledby="page-title">
+<header class="h-36 bg-white sm:h-62 standalone:max-sm:h-54" aria-labelledby="page-title">
   <div
-    class="mx-auto flex h-42 max-w-3xl flex-col items-start justify-between pt-[max(--spacing(14),env(safe-area-inset-top))] pr-[calc(--spacing(12)+env(safe-area-inset-right))] pl-[calc(--spacing(12)+env(safe-area-inset-left))] sm:h-52 sm:pt-[calc(--spacing(16)+env(safe-area-inset-top))] sm:pr-[calc(--spacing(9)+env(safe-area-inset-right))] sm:pl-[calc(--spacing(9)+env(safe-area-inset-left))]"
+    class="mx-auto flex h-26 max-w-3xl flex-col items-start justify-between pt-[max(--spacing(4),env(safe-area-inset-top))] pr-[calc(--spacing(12)+env(safe-area-inset-right))] pl-[calc(--spacing(12)+env(safe-area-inset-left))] sm:h-52 sm:pt-[calc(--spacing(16)+env(safe-area-inset-top))] sm:pr-[calc(--spacing(9)+env(safe-area-inset-right))] sm:pl-[calc(--spacing(9)+env(safe-area-inset-left))] standalone:max-sm:h-44 standalone:max-sm:pt-[calc(max(--spacing(4),env(safe-area-inset-top))+(--spacing(6)))]"
   >
     <img
       class="pointer-events-none block h-9 select-none sm:h-12"
@@ -22,7 +22,7 @@
   >
     <button
       class="flex flex-1 cursor-pointer items-center justify-center rounded-t px-3 text-2xl leading-[1.2] font-bold focus-visible:z-1 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-nlr-blue"
-      [class]="campus() === 'stm' ? 'bg-[#0e315e] text-white' : 'bg-[#d9d9d9] text-nlr-blue'"
+      [class]="campus() === 'stm' ? 'bg-nlr-deep-blue text-white' : 'bg-[#d9d9d9] text-nlr-blue'"
       type="button"
       [attr.aria-pressed]="campus() === 'stm'"
       (click)="campusSelection.select('stm')"
@@ -31,7 +31,9 @@
     </button>
     <button
       class="flex flex-1 cursor-pointer items-center justify-center rounded-t px-3 text-2xl leading-[1.2] font-bold focus-visible:z-1 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-nlr-blue"
-      [class]="campus() === 'flatirons' ? 'bg-[#0e315e] text-white' : 'bg-[#d9d9d9] text-nlr-blue'"
+      [class]="
+        campus() === 'flatirons' ? 'bg-nlr-deep-blue text-white' : 'bg-[#d9d9d9] text-nlr-blue'
+      "
       type="button"
       [attr.aria-pressed]="campus() === 'flatirons'"
       (click)="campusSelection.select('flatirons')"
@@ -42,7 +44,7 @@
 </header>
 
 <main
-  class="min-h-[calc(var(--app-height)-(--spacing(52)))] bg-[linear-gradient(180deg,#0e315e_0%,#0d5d99_100%)] pt-4 pr-[calc(--spacing(5.5)+env(safe-area-inset-right))] pb-[calc(--spacing(12)+env(safe-area-inset-bottom))] pl-[calc(--spacing(5.5)+env(safe-area-inset-left))] text-white sm:min-h-[calc(var(--app-height)-(--spacing(62)))] sm:pt-6 sm:pr-[calc(--spacing(10)+env(safe-area-inset-right))] sm:pb-[calc(--spacing(16)+env(safe-area-inset-bottom))] sm:pl-[calc(--spacing(10)+env(safe-area-inset-left))]"
+  class="min-h-[calc(var(--app-height)-(--spacing(36)))] bg-[linear-gradient(180deg,var(--color-nlr-deep-blue)_0%,#0d5d99_100%)] pt-4 pr-[calc(--spacing(5.5)+env(safe-area-inset-right))] pb-[calc(--spacing(16)+env(safe-area-inset-bottom))] pl-[calc(--spacing(5.5)+env(safe-area-inset-left))] text-white sm:min-h-[calc(var(--app-height)-(--spacing(62)))] sm:pt-6 sm:pr-[calc(--spacing(10)+env(safe-area-inset-right))] sm:pb-[calc(--spacing(16)+env(safe-area-inset-bottom))] sm:pl-[calc(--spacing(10)+env(safe-area-inset-left))] standalone:max-sm:min-h-[calc(var(--app-height)-(--spacing(54)))]"
 >
   <section class="mx-auto max-w-3xl" aria-labelledby="availability-heading">
     <h2

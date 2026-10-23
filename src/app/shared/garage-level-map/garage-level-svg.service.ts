@@ -1,52 +1,60 @@
-import { HttpClient } from '@angular/common/http'
-import { Injectable, inject, signal } from '@angular/core'
-import { EMPTY, catchError, finalize, retry } from 'rxjs'
+import { HttpResourceRef, httpResource } from '@angular/common/http'
+import { Service, effect } from '@angular/core'
 
 import { GARAGE_LEVELS, ParkingArea } from '../../garage-levels'
 
 const PARKING_AREAS: readonly ParkingArea[] = [...GARAGE_LEVELS, 'fc']
+const SVG_RETRY_COUNT = 2
+const SVG_RETRY_DELAY_MS = 1_000
 
-const svgUrl = (area: ParkingArea): string =>
+export const svgUrl = (area: ParkingArea): string =>
   area === 'fc' ? 'levels/fc.svg' : `levels/level-${area}.svg`
 
-@Injectable({ providedIn: 'root' })
+/**
+ * Loads every parking-area map up front so navigating between levels is instant, and keeps
+ * the markup in memory for the lifetime of the app.
+ */
+@Service()
 export class GarageLevelSvgService {
-  private readonly http = inject(HttpClient)
-  private readonly sourcesState = signal<Partial<Record<ParkingArea, string>>>({})
-  private readonly loadingState = signal(new Set<ParkingArea>(PARKING_AREAS))
-  private lastSource = ''
+  private readonly sources: ReadonlyMap<ParkingArea, HttpResourceRef<string | undefined>> = new Map(
+    PARKING_AREAS.map((area) => [area, httpResource.text(() => svgUrl(area))]),
+  )
 
   constructor() {
-    for (const area of PARKING_AREAS) {
-      this.http
-        .get(svgUrl(area), { responseType: 'text' })
-        .pipe(
-          retry({ count: 2, delay: 1_000 }),
-          catchError(() => EMPTY),
-          finalize(() => {
-            this.loadingState.update((loading) => {
-              const updated = new Set(loading)
-              updated.delete(area)
-              return updated
-            })
-          }),
-        )
-        .subscribe((source) => {
-          this.sourcesState.update((sources) => ({ ...sources, [area]: source }))
-        })
+    for (const source of this.sources.values()) {
+      this.retryOnError(source)
     }
   }
 
+  /** The SVG markup for `area`, or an empty string until it is available. */
   sourceFor(area: ParkingArea): string {
-    const source = this.sourcesState()[area]
-    if (source) {
-      this.lastSource = source
-    }
-
-    return source ?? (this.loadingState().has(area) ? this.lastSource : '')
+    const source = this.source(area)
+    return source.hasValue() ? source.value() : ''
   }
 
   isLoading(area: ParkingArea): boolean {
-    return this.loadingState().has(area)
+    return this.source(area).isLoading()
+  }
+
+  private source(area: ParkingArea): HttpResourceRef<string | undefined> {
+    const source = this.sources.get(area)
+    if (!source) {
+      throw new Error(`Unknown parking area: ${area}`)
+    }
+
+    return source
+  }
+
+  private retryOnError(source: HttpResourceRef<string | undefined>): void {
+    let attempts = 0
+    effect((onCleanup) => {
+      if (source.status() !== 'error' || attempts >= SVG_RETRY_COUNT) {
+        return
+      }
+
+      attempts += 1
+      const timeout = setTimeout(() => source.reload(), SVG_RETRY_DELAY_MS)
+      onCleanup(() => clearTimeout(timeout))
+    })
   }
 }

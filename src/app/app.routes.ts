@@ -1,9 +1,34 @@
-import { Routes } from '@angular/router'
+import { inject } from '@angular/core'
+import { CanActivateFn, Routes } from '@angular/router'
 
-import { GarageMapPage } from './pages/garage-map-page/garage-map-page'
+import { CampusSelectionService, campusFor } from './campus-selection.service'
+import { GARAGE_LEVELS, ParkingArea } from './garage-levels'
 import { HomePage } from './pages/home-page/home-page'
-import { LevelPage } from './pages/level-page/level-page'
-import { GARAGE_LEVELS } from './garage-levels'
+
+/** Opening an area's page makes its campus the one the home page shows next time. */
+export const rememberCampus: CanActivateFn = (route) => {
+  inject(CampusSelectionService).select(campusFor(route.data['level'] as ParkingArea))
+  return true
+}
+
+/** The spaces view and map view of one parking area, sharing its `level` route data. */
+const areaRoutes = (path: string, level: ParkingArea, title: string, mapTitle: string): Routes => [
+  {
+    path,
+    loadComponent: () => import('./pages/level-page/level-page').then((m) => m.LevelPage),
+    canActivate: [rememberCampus],
+    data: { level },
+    title: `${title} | NLR EVSE`,
+  },
+  {
+    path: `${path}/map`,
+    loadComponent: () =>
+      import('./pages/garage-map-page/garage-map-page').then((m) => m.GarageMapPage),
+    canActivate: [rememberCampus],
+    data: { level },
+    title: `${mapTitle} | NLR EVSE`,
+  },
+]
 
 export const routes: Routes = [
   {
@@ -12,31 +37,9 @@ export const routes: Routes = [
     component: HomePage,
     title: 'Find a Charger | NLR EVSE',
   },
-  {
-    path: 'fc',
-    component: LevelPage,
-    data: { level: 'fc' },
-    title: 'Flatirons Campus | NLR EVSE',
-  },
-  {
-    path: 'fc/map',
-    component: GarageMapPage,
-    data: { level: 'fc' },
-    title: 'Flatirons Campus Map | NLR EVSE',
-  },
-  ...GARAGE_LEVELS.flatMap((level) => [
-    {
-      path: `level/${level}`,
-      component: LevelPage,
-      data: { level },
-      title: `Level ${level} | NLR EVSE`,
-    },
-    {
-      path: `level/${level}/map`,
-      component: GarageMapPage,
-      data: { level },
-      title: `Level ${level} Garage Map | NLR EVSE`,
-    },
-  ]),
+  ...areaRoutes('fc', 'fc', 'Flatirons Campus', 'Flatirons Campus Map'),
+  ...GARAGE_LEVELS.flatMap((level) =>
+    areaRoutes(`level/${level}`, level, `Level ${level}`, `Level ${level} Garage Map`),
+  ),
   { path: '**', redirectTo: '' },
 ]

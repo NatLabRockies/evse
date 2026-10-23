@@ -8,6 +8,8 @@
   --color-available: #4fab47;
   --color-in-use: #ffd54f;
   --color-offline: #996bae;
+  --color-car: #231f20;
+  --color-loading: rgb(255 255 255 / 18%);
 }
 
 @utility font-condensed {

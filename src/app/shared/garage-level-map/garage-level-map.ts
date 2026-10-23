@@ -11,9 +11,10 @@ const STATUS_FILL: Readonly<Record<MapStatus, string>> = {
   available: 'var(--color-available)',
   'in-use': 'var(--color-in-use)',
   offline: 'var(--color-offline)',
-  loading: 'rgb(255 255 255 / 18%)',
+  loading: 'var(--color-loading)',
 }
 
+const CAR_FILL = 'var(--color-car)'
 const PARKING_SPACE_PATTERN = /(?:^|[-_])(lv\d{2}-\d{2}|[1-8][ab])_?$/i
 const SVG_NAMESPACE = 'http://www.w3.org/2000/svg'
 const OFFLINE_PATTERN_ID = 'evse-dashboard-offline-cross'
@@ -73,7 +74,7 @@ export function applyStationStatuses(
     if (elementId.includes('handicap')) {
       element.style.display = status === 'in-use' ? 'none' : ''
     } else if (elementId.includes('car')) {
-      element.style.fill = status === 'in-use' ? '#231f20' : 'none'
+      element.style.fill = status === 'in-use' ? CAR_FILL : 'none'
       // Illustrator can put fill:none on symbol paths; let each use supply its color.
       const reference = element.getAttribute('href') ?? element.getAttribute('xlink:href')
       if (reference?.startsWith('#')) {
@@ -124,11 +125,16 @@ export class GarageLevelMap {
 
   readonly level = input.required<ParkingArea>()
 
-  protected readonly svgSource = computed(() => this.svgService.sourceFor(this.level()))
-  protected readonly svgLoading = computed(() => this.svgService.isLoading(this.level()))
-  protected readonly svgMarkup = computed(() =>
+  protected readonly label = computed(() =>
+    this.level() === 'fc' ? 'Flatirons Campus map' : `Level ${this.level()} garage map`,
+  )
+  protected readonly loading = computed(() => this.svgService.isLoading(this.level()))
+  protected readonly markup = computed(() =>
     this.sanitizer.bypassSecurityTrustHtml(
-      renderGarageLevelSvg(this.svgSource(), this.availabilityService.stationStatuses()),
+      renderGarageLevelSvg(
+        this.svgService.sourceFor(this.level()),
+        this.availabilityService.stationStatuses(),
+      ),
     ),
   )
 }

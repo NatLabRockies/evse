@@ -20,11 +20,11 @@ describe('applyStationStatuses', () => {
 
     expect(svgDocument.getElementById('_1a')?.style.fill).toContain('--color-in-use')
     expect(svgDocument.getElementById('4a')?.style.fill).toContain('--color-available')
-    expect(svgDocument.getElementById('car-1a')?.style.fill).toBe('#231f20')
+    expect(svgDocument.getElementById('car-1a')?.style.fill).toBe('var(--color-car)')
     expect(svgDocument.getElementById('car-4a')?.style.fill).toBe('none')
     expect(svgDocument.getElementById('car-2')?.style.fill).toBe('inherit')
-    expect(svgDocument.getElementById('lv21-01')?.style.fill).toBe(
-      'url(#evse-dashboard-offline-cross)',
+    expect(svgDocument.getElementById('lv21-01')?.style.fill).toContain(
+      '#evse-dashboard-offline-cross',
     )
     const offlinePattern = svgDocument.getElementById('evse-dashboard-offline-cross')
     expect(offlinePattern?.querySelector('rect')?.getAttribute('fill')).toContain('--color-offline')
@@ -55,7 +55,7 @@ describe('applyStationStatuses', () => {
       '--color-in-use',
     )
     expect(svgDocument.getElementById('_car-offline-lv21-01_')?.getAttribute('style')).toContain(
-      '#231f20',
+      '--color-car',
     )
     expect(svgDocument.getElementById('_lv21-02_')?.getAttribute('style')).toContain(
       '--color-available',
@@ -64,7 +64,7 @@ describe('applyStationStatuses', () => {
       'none',
     )
     expect(svgDocument.getElementById('_lv21-03_')?.getAttribute('style')).toContain(
-      'rgb(255 255 255 / 18%)',
+      '--color-loading',
     )
   })
 

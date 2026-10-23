@@ -1,51 +1,25 @@
-import { DatePipe } from '@angular/common'
-import { Component, computed, inject } from '@angular/core'
-import { RouterLink } from '@angular/router'
+import { Tab, TabContent, TabList, TabPanel, Tabs } from '@angular/aria/tabs'
+import { NgOptimizedImage } from '@angular/common'
+import { Component, inject } from '@angular/core'
 
-import { CampusSelectionService } from '../../campus-selection.service'
-import { EvseAvailabilityService } from '../../evse-availability.service'
-import { accentColors } from '../../shared/accent'
-import { WHEELCHAIR_ICON } from '../../shared/icons'
+import { CAMPUSES, CampusSelectionService, isCampus } from '../../campus-selection.service'
+import { CampusAvailability } from './campus-availability/campus-availability'
 
 @Component({
   selector: 'app-home-page',
-  imports: [DatePipe, RouterLink],
+  imports: [CampusAvailability, NgOptimizedImage, Tab, TabContent, TabList, TabPanel, Tabs],
   templateUrl: './home-page.html',
   styleUrl: './home-page.css',
 })
 export class HomePage {
-  private readonly availabilityService = inject(EvseAvailabilityService)
-  protected readonly campusSelection = inject(CampusSelectionService)
+  private readonly campusSelection = inject(CampusSelectionService)
+
+  protected readonly campuses = CAMPUSES
   protected readonly campus = this.campusSelection.campus
 
-  protected readonly wheelchairIcon = WHEELCHAIR_ICON
-  protected readonly accentColors = accentColors
-  protected readonly destinations = computed(() =>
-    this.campus() === 'stm'
-      ? this.availabilityService
-          .chargerLevels()
-          .toReversed()
-          .map((level) => ({
-            ...level,
-            id: String(level.level),
-            link: ['/level', level.level],
-          }))
-      : this.availabilityService.flatironsRegions().map((region) => ({
-          id: region.id,
-          label: region.label,
-          available: region.available,
-          accent: region.accent,
-          accessible: false,
-          link: ['/fc'],
-        })),
-  )
-  protected readonly chargerSummary = computed(() =>
-    this.campus() === 'stm'
-      ? this.availabilityService.chargerSummary()
-      : this.availabilityService.flatironsSummary(),
-  )
-  protected readonly lastUpdated = this.availabilityService.lastUpdated
-  protected readonly lastUpdatedRelative = this.availabilityService.lastUpdatedRelative
-  protected readonly isLoading = this.availabilityService.isLoading
-  protected readonly hasError = this.availabilityService.hasError
+  protected selectCampus(value: string | undefined): void {
+    if (isCampus(value)) {
+      this.campusSelection.select(value)
+    }
+  }
 }

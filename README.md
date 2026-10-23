@@ -16,9 +16,10 @@ pnpm start
 
 The Angular 22/Tailwind 4 interface:
 
-- Loads live EVSE data from S3 every 60 seconds and immediately when the app regains focus.
+- Loads live EVSE data from S3 every 60 seconds and immediately when the app regains focus,
+  keeping the last good data on screen if a refresh fails.
 - Remembers the selected STM or Flatirons campus and summarizes available, in-use, and offline
-  chargers.
+  chargers, with keyboard-accessible campus tabs built on Angular Aria.
 - Provides responsive space and map views for STM garage levels 1–4 and the Flatirons lot,
   including accessible charging, and elapsed charging time.
 - Supports installation as an iOS web app and caches application assets with a service worker.

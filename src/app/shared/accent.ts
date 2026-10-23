@@ -19,7 +19,7 @@ const ACCENT_COLORS: Readonly<Record<ChargerStatus | 'loading', AccentColors>> =
     foreground: 'black',
   },
   loading: {
-    background: 'rgb(255 255 255 / 20%)',
+    background: 'var(--color-loading)',
     foreground: 'white',
   },
 }

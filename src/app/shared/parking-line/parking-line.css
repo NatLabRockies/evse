@@ -74,14 +74,14 @@
 }
 
 .is-loading {
-  background: rgb(255 255 255 / 18%);
+  background: var(--color-loading);
 }
 
 .car-icon {
   display: block;
   width: 75%;
   height: 75%;
-  color: #231f20;
+  color: var(--color-car);
 }
 
 .has-reversed-cars .car-icon {
@@ -92,5 +92,5 @@
   display: block;
   width: 70%;
   height: 70%;
-  color: #003a69;
+  color: var(--color-nlr-blue);
 }

@@ -1,9 +1,8 @@
-import { Component, inject } from '@angular/core'
-import { ActivatedRoute, RouterLink } from '@angular/router'
+import { Component, computed, input } from '@angular/core'
+import { RouterLink } from '@angular/router'
 
-import { CampusSelectionService } from '../../campus-selection.service'
 import { FLATIRONS_REGIONS } from '../../flatirons'
-import { ParkingArea } from '../../garage-levels'
+import { ParkingArea, areaLink } from '../../garage-levels'
 import { CompassRose } from '../../shared/compass-rose/compass-rose'
 import { GarageLevelMap } from '../../shared/garage-level-map/garage-level-map'
 import { LevelNavigation } from '../../shared/level-navigation/level-navigation'
@@ -21,8 +20,8 @@ interface ParkingRegion {
   readonly label: string
   readonly orientation: ParkingLineOrientation
   readonly spaces: readonly ParkingSpaceId[]
-  readonly accessible?: boolean
-  readonly reverseCars?: boolean
+  readonly accessible: boolean
+  readonly reverseCars: boolean
 }
 
 interface LevelRegions {
@@ -101,18 +100,19 @@ const LEVEL_REGIONS: Readonly<Record<ParkingArea, LevelRegions>> = {
   styleUrl: './level-page.css',
 })
 export class LevelPage {
-  protected readonly level: ParkingArea = inject(ActivatedRoute).snapshot.data['level']
-  protected readonly regions = LEVEL_REGIONS[this.level]
-  protected readonly verticalSpaceCount = Math.max(
-    ...this.regions.center.map(({ spaces }) => spaces.length),
-  )
-  protected readonly horizontalSpaceCount = this.regions.northwest?.spaces.length ?? 0
-  protected readonly centerColumnCount = this.regions.center.length
-  protected readonly mapLink = this.level === 'fc' ? ['/fc', 'map'] : ['/level', this.level, 'map']
-  protected readonly mapLabel =
-    this.level === 'fc' ? 'Flatirons Campus map' : `Level ${this.level} garage map`
+  /** Bound from the route's `data.level`. */
+  readonly level = input.required<ParkingArea>()
 
-  constructor() {
-    inject(CampusSelectionService).select(this.level === 'fc' ? 'flatirons' : 'stm')
-  }
+  protected readonly regions = computed(() => LEVEL_REGIONS[this.level()])
+  protected readonly verticalSpaceCount = computed(() =>
+    Math.max(...this.regions().center.map(({ spaces }) => spaces.length)),
+  )
+  protected readonly horizontalSpaceCount = computed(
+    () => this.regions().northwest?.spaces.length ?? 0,
+  )
+  protected readonly centerColumnCount = computed(() => this.regions().center.length)
+  protected readonly mapLink = computed(() => areaLink(this.level(), 'map'))
+  protected readonly mapLabel = computed(() =>
+    this.level() === 'fc' ? 'Flatirons Campus map' : `Level ${this.level()} garage map`,
+  )
 }

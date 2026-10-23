@@ -1,8 +1,6 @@
-import { Component, inject } from '@angular/core'
-import { ActivatedRoute } from '@angular/router'
+import { Component, computed, input } from '@angular/core'
 
-import { CampusSelectionService } from '../../campus-selection.service'
-import { ParkingArea } from '../../garage-levels'
+import { ParkingArea, areaLink } from '../../garage-levels'
 import { CompassRose } from '../../shared/compass-rose/compass-rose'
 import { GarageLevelMap } from '../../shared/garage-level-map/garage-level-map'
 import { LevelNavigation } from '../../shared/level-navigation/level-navigation'
@@ -15,10 +13,8 @@ import { LevelStatusHeader } from '../../shared/level-status-header/level-status
   styleUrl: './garage-map-page.css',
 })
 export class GarageMapPage {
-  protected readonly level = inject(ActivatedRoute).snapshot.data['level'] as ParkingArea
-  protected readonly spacesLink = this.level === 'fc' ? ['/fc'] : ['/level', this.level]
+  /** Bound from the route's `data.level`. */
+  readonly level = input.required<ParkingArea>()
 
-  constructor() {
-    inject(CampusSelectionService).select(this.level === 'fc' ? 'flatirons' : 'stm')
-  }
+  protected readonly spacesLink = computed(() => areaLink(this.level()))
 }

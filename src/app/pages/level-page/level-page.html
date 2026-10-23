@@ -1,7 +1,7 @@
 <div
   class="level-page-shell grid h-(--app-height) grid-rows-[auto_minmax(0,1fr)_auto] overflow-hidden bg-[linear-gradient(180deg,var(--color-nlr-deep-blue)_0%,#0d5d99_100%)] text-white standalone:max-sm:pt-3"
 >
-  <app-level-status-header [level]="level" actionLabel="View Map" [actionLink]="mapLink" />
+  <app-level-status-header [level]="level()" actionLabel="View Map" [actionLink]="mapLink()" />
 
   <main
     class="min-h-0 py-2 pr-[calc(--spacing(3)+env(safe-area-inset-right))] pl-[calc(--spacing(3)+env(safe-area-inset-left))]"
@@ -11,10 +11,10 @@
     >
       <a
         class="group flex min-h-0 flex-col items-center justify-center text-center"
-        [routerLink]="mapLink"
-        [attr.aria-label]="'Expand ' + mapLabel"
+        [routerLink]="mapLink()"
+        [attr.aria-label]="'Expand ' + mapLabel()"
       >
-        <app-garage-level-map [level]="level" />
+        <app-garage-level-map [level]="level()" />
       </a>
 
       <section
@@ -25,12 +25,12 @@
 
         <div
           class="parking-layout flex min-h-0 flex-1 flex-col landscape:flex-none"
-          [class.has-horizontal-line]="horizontalSpaceCount > 0"
-          [style.--vertical-space-count]="verticalSpaceCount"
-          [style.--horizontal-space-count]="horizontalSpaceCount"
-          [style.--center-column-count]="centerColumnCount"
+          [class.has-horizontal-line]="horizontalSpaceCount() > 0"
+          [style.--vertical-space-count]="verticalSpaceCount()"
+          [style.--horizontal-space-count]="horizontalSpaceCount()"
+          [style.--center-column-count]="centerColumnCount()"
         >
-          @if (regions.northwest; as northwest) {
+          @if (regions().northwest; as northwest) {
             <figure class="mb-2 flex shrink-0 flex-col items-center" data-region="northwest">
               <figcaption class="mb-1 text-center text-base leading-none">
                 {{ northwest.label }}
@@ -52,10 +52,10 @@
 
             <div
               class="grid min-h-0 gap-4"
-              [class.grid-cols-1]="regions.center.length === 1"
-              [class.grid-cols-2]="regions.center.length === 2"
+              [class.grid-cols-1]="centerColumnCount() === 1"
+              [class.grid-cols-2]="centerColumnCount() === 2"
             >
-              @for (region of regions.center; track region.id) {
+              @for (region of regions().center; track region.id) {
                 <figure class="flex min-h-0 flex-col items-center" [attr.data-region]="region.id">
                   <figcaption class="mb-1 text-center text-base leading-none">
                     {{ region.label }}
@@ -64,8 +64,8 @@
                     [label]="region.label"
                     [orientation]="region.orientation"
                     [spaces]="region.spaces"
-                    [accessible]="region.accessible ?? false"
-                    [reverseCars]="region.reverseCars ?? false"
+                    [accessible]="region.accessible"
+                    [reverseCars]="region.reverseCars"
                   />
                 </figure>
               }
@@ -78,5 +78,5 @@
     </div>
   </main>
 
-  <app-level-navigation [showLevels]="level !== 'fc'" />
+  <app-level-navigation [showLevels]="level() !== 'fc'" />
 </div>

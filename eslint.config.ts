@@ -1,10 +1,9 @@
-// @ts-check
-const eslint = require('@eslint/js')
-const { defineConfig } = require('eslint/config')
-const tseslint = require('typescript-eslint')
-const angular = require('angular-eslint')
+import eslint from '@eslint/js'
+import { defineConfig } from 'eslint/config'
+import tseslint from 'typescript-eslint'
+import angular from 'angular-eslint'
 
-module.exports = defineConfig([
+export default defineConfig([
   {
     files: ['**/*.ts'],
     extends: [
@@ -31,6 +30,7 @@ module.exports = defineConfig([
           style: 'kebab-case',
         },
       ],
+      '@typescript-eslint/consistent-type-definitions': ['error', 'type'],
     },
   },
   {

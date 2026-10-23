@@ -1,6 +1,6 @@
 import type { ChargerStatus } from '../evse-availability.service'
 
-interface AccentColors {
+type AccentColors = {
   readonly background: string
   readonly foreground: string
   /** Drawn over the background so that offline differs from in use by more than color. */

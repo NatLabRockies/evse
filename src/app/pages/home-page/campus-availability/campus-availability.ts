@@ -9,7 +9,7 @@ import { accentColors, availabilityText } from '../../../shared/accent'
 import { WHEELCHAIR_ICON } from '../../../shared/icons'
 
 /** A place the visitor can go to charge: a garage level at STM or a lot region at Flatirons. */
-interface Destination {
+type Destination = {
   readonly id: string
   readonly label: string
   readonly available: number | null

@@ -15,7 +15,7 @@ import { LevelStatusHeader } from '../../shared/level-status-header/level-status
 
 type RegionId = 'northwest' | 'center-west' | 'center-east' | 'west' | 'east'
 
-interface ParkingRegion {
+type ParkingRegion = {
   readonly id: RegionId
   readonly label: string
   readonly orientation: ParkingLineOrientation
@@ -24,7 +24,7 @@ interface ParkingRegion {
   readonly reverseCars: boolean
 }
 
-interface LevelRegions {
+type LevelRegions = {
   readonly northwest?: ParkingRegion
   readonly center: readonly ParkingRegion[]
 }

@@ -15,7 +15,7 @@ export const CLOCK_INTERVAL_MS = 1_000
 export type ChargerStatus = 'available' | 'in-use' | 'offline'
 export type EvseState = 'Charging' | 'Plugged In' | 'Preparing' | 'Ready' | 'Stopped' | 'unknown'
 
-export interface ChargerLevel {
+export type ChargerLevel = {
   readonly level: GarageLevel
   readonly label: string
   readonly available: number | null
@@ -23,37 +23,37 @@ export interface ChargerLevel {
   readonly accessible?: boolean
 }
 
-export interface ChargerRegion {
+export type ChargerRegion = {
   readonly id: string
   readonly label: string
   readonly available: number | null
   readonly accent: ChargerStatus | null
 }
 
-export interface ChargerSummary {
+export type ChargerSummary = {
   readonly count: number | null
   readonly label: string
   readonly accent: ChargerStatus
 }
 
-export interface AreaStatus {
+export type AreaStatus = {
   readonly available: number | null
   readonly accent: ChargerStatus | null
 }
 
-interface DashboardStation {
+type DashboardStation = {
   readonly parking_space: string
   readonly evse_state: EvseState
   readonly online: boolean
   readonly session_start_time: number | null
 }
 
-interface DashboardData {
+type DashboardData = {
   readonly updated: number
   readonly stations: readonly DashboardStation[]
 }
 
-interface AvailabilitySnapshot {
+type AvailabilitySnapshot = {
   readonly levels: readonly ChargerLevel[]
   readonly summary: readonly ChargerSummary[]
   readonly flatironsRegions: readonly ChargerRegion[]

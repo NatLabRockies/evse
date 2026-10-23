@@ -36,6 +36,10 @@ yarn-error.log
 testem.log
 /typings
 __screenshots__/
+.vitest-attachments/
+# Only CI's Linux references are committed. Other platforms' are local baselines.
+/.storybook/screenshots/*
+!/.storybook/screenshots/linux/
 
 # System files
 .DS_Store

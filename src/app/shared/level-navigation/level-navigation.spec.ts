@@ -51,6 +51,15 @@ describe('LevelNavigation', () => {
       'Level 3, 2 available, accessible charging',
       'Level 4, 0 available, all offline',
     ])
+    // Punctuation aside, each level's visible text in markup order begins its accessible name
+    // (WCAG 2.5.3 Label in Name).
+    expect(links.map((link) => link.textContent?.replace(/\s+/g, ' ').trim())).toEqual([
+      'Home',
+      'Level 1 5',
+      'Level 2 14',
+      'Level 3 2',
+      'Level 4 0',
+    ])
     expect(links[4].style.getPropertyValue('--active-background')).toBe('var(--color-offline)')
   })
 

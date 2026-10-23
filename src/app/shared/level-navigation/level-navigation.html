@@ -17,8 +17,10 @@
     </a>
 
     @for (level of levels(); track level.level) {
+      <!-- The level leads the markup so the visible text starts the accessible name (WCAG 2.5.3),
+           but shows under the count. -->
       <a
-        class="flex h-11 min-w-0 flex-col items-center justify-center rounded bg-white text-xs leading-none text-nlr-blue focus-visible:outline-3 focus-visible:outline-offset-1 focus-visible:outline-white"
+        class="flex h-11 min-w-0 flex-col-reverse items-center justify-center rounded bg-white text-xs leading-none text-nlr-blue focus-visible:outline-3 focus-visible:outline-offset-1 focus-visible:outline-white"
         [routerLink]="level.link"
         [attr.aria-label]="level.label + ', ' + level.description"
         [style.--active-background]="level.colors.background"
@@ -26,6 +28,7 @@
         routerLinkActive="is-active"
         ariaCurrentWhenActive="page"
       >
+        <span class="truncate">Level {{ level.level }}</span>
         <span class="mb-0.5 flex h-5 items-center justify-center gap-1">
           @if (level.accessible) {
             <svg
@@ -41,7 +44,6 @@
             {{ level.available ?? '—' }}
           </strong>
         </span>
-        <span class="truncate">Level {{ level.level }}</span>
       </a>
     }
   </div>

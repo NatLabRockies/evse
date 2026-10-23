@@ -8,6 +8,7 @@ import {
   campusName,
   isCampus,
 } from './campus-selection.service'
+import { stubLocalStorage } from './testing/local-storage.stub'
 
 describe('campus helpers', () => {
   it('maps parking areas to campuses', () => {
@@ -30,21 +31,24 @@ describe('campus helpers', () => {
 })
 
 describe('CampusSelectionService', () => {
-  afterEach(() => {
-    vi.restoreAllMocks()
-    localStorage.clear()
+  let storage: Storage
+
+  beforeEach(() => {
+    storage = stubLocalStorage()
   })
+
+  afterEach(() => vi.restoreAllMocks())
 
   it('defaults to STM when nothing is stored', () => {
     expect(TestBed.inject(CampusSelectionService).campus()).toBe('stm')
   })
 
   it('restores a stored campus and ignores unknown values', () => {
-    localStorage.setItem(CAMPUS_STORAGE_KEY, 'flatirons')
+    storage.setItem(CAMPUS_STORAGE_KEY, 'flatirons')
     expect(TestBed.inject(CampusSelectionService).campus()).toBe('flatirons')
 
     TestBed.resetTestingModule()
-    localStorage.setItem(CAMPUS_STORAGE_KEY, 'moon')
+    storage.setItem(CAMPUS_STORAGE_KEY, 'moon')
     expect(TestBed.inject(CampusSelectionService).campus()).toBe('stm')
   })
 
@@ -54,11 +58,11 @@ describe('CampusSelectionService', () => {
     service.select('flatirons')
 
     expect(service.campus()).toBe('flatirons')
-    expect(localStorage.getItem(CAMPUS_STORAGE_KEY)).toBe('flatirons')
+    expect(storage.getItem(CAMPUS_STORAGE_KEY)).toBe('flatirons')
   })
 
   it('keeps working when storage is unavailable', () => {
-    vi.spyOn(window, 'localStorage', 'get').mockImplementation(() => {
+    vi.spyOn(document.defaultView!, 'localStorage', 'get').mockImplementation(() => {
       throw new DOMException('Blocked', 'SecurityError')
     })
     const service = TestBed.inject(CampusSelectionService)
@@ -66,5 +70,6 @@ describe('CampusSelectionService', () => {
     expect(service.campus()).toBe('stm')
     expect(() => service.select('flatirons')).not.toThrow()
     expect(service.campus()).toBe('flatirons')
+    expect(storage.length).toBe(0)
   })
 })

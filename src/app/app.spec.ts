@@ -13,6 +13,7 @@ import {
   createEvseAvailabilityStub,
   provideEvseAvailabilityStub,
 } from './testing/evse-availability.stub'
+import { stubLocalStorage } from './testing/local-storage.stub'
 
 const TEST_MAP_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 50">
   <defs><symbol id="_car-horizontal_"><path d="M0 0h1v1H0z" /></symbol></defs>
@@ -25,26 +26,11 @@ const TEST_FC_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 178 11
   <path id="4a" d="M0 5h10v5H0z" />
 </svg>`
 
-const storedValues = new Map<string, string>()
-const campusStorage: Storage = {
-  get length() {
-    return storedValues.size
-  },
-  clear: () => storedValues.clear(),
-  key: (index: number) => Array.from(storedValues.keys())[index] ?? null,
-  removeItem: (key: string) => {
-    storedValues.delete(key)
-  },
-  getItem: (key: string) => storedValues.get(key) ?? null,
-  setItem: (key: string, value: string) => {
-    storedValues.set(key, value)
-  },
-}
-
 describe('App routing', () => {
+  let campusStorage: Storage
+
   beforeEach(async () => {
-    storedValues.clear()
-    vi.spyOn(document.defaultView!, 'localStorage', 'get').mockReturnValue(campusStorage)
+    campusStorage = stubLocalStorage()
     await TestBed.configureTestingModule({
       imports: [App],
       providers: [
@@ -73,8 +59,35 @@ describe('App routing', () => {
       '/level/2',
       '/level/1',
     ])
+    expect(levelLinks.map((link) => link.getAttribute('aria-label'))).toEqual([
+      'Level 4, 0 available, all offline',
+      'Level 3, 2 available, accessible charging',
+      'Level 2, 14 available',
+      'Level 1, 5 available',
+    ])
+    expect(
+      levelLinks.map((link) => link.querySelector<HTMLElement>('span')?.style.backgroundImage),
+    ).toEqual(['var(--offline-cross-image)', 'none', 'none', 'none'])
     expect(compiled.querySelectorAll('dl > div')).toHaveLength(3)
+    expect(
+      Array.from(compiled.querySelectorAll('dl > div')).map((group) =>
+        Array.from(group.children).map((child) => child.tagName),
+      ),
+    ).toEqual(Array(3).fill(['DT', 'DD']))
     expect(compiled.querySelector('time')?.textContent).toContain('less than a minute ago')
+  })
+
+  it('moves focus to the new page heading after navigating, but not on the first load', async () => {
+    // Start on a level so that the maps the next page shows have already loaded.
+    const { fixture, compiled } = await renderRoute('/level/1')
+
+    expect(document.activeElement).toBe(document.body)
+
+    await TestBed.inject(Router).navigateByUrl('/level/2')
+    await fixture.whenStable()
+
+    expect(document.activeElement).toBe(compiled.querySelector('h1'))
+    expect(document.activeElement?.textContent).toContain('LEVEL 2')
   })
 
   it('renders the level overview with live parking spaces', async () => {
@@ -230,7 +243,9 @@ describe('App routing', () => {
   it('renders the expanded, orientation-aware garage route', async () => {
     const { compiled } = await renderRoute('/level/3/map')
 
-    expect(compiled.querySelector('h1')?.textContent).toContain('LEVEL 3')
+    expect(compiled.querySelector('h1')?.textContent?.replace(/\s+/g, ' ').trim()).toBe(
+      'LEVEL 3 map',
+    )
     expect(document.title).toBe('Level 3 Garage Map | NLR EVSE')
     expect(compiled.querySelector('[role="img"][aria-label="Level 3 garage map"]')).toBeTruthy()
     expect(compiled.querySelector('.garage-plan-frame > app-compass-rose')).toBeTruthy()

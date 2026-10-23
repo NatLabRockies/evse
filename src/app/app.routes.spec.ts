@@ -1,8 +1,10 @@
 import { TestBed } from '@angular/core/testing'
 import { ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router'
+import { vi } from 'vitest'
 
 import { rememberCampus, routes } from './app.routes'
 import { CampusSelectionService } from './campus-selection.service'
+import { stubLocalStorage } from './testing/local-storage.stub'
 
 describe('routes', () => {
   it('declares a spaces view and a map view for every parking area', () => {
@@ -28,6 +30,9 @@ describe('routes', () => {
 })
 
 describe('rememberCampus', () => {
+  beforeEach(() => stubLocalStorage())
+  afterEach(() => vi.restoreAllMocks())
+
   const activate = (level: unknown) =>
     TestBed.runInInjectionContext(() =>
       rememberCampus(

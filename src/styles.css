@@ -6,6 +6,8 @@
   --color-nlr-deep-blue: #0e315e;
   --color-nlr-navy: #052337;
   --color-available: #4fab47;
+  /* A darker shade for text on white, which needs 4.5:1 contrast. */
+  --color-available-text: #378232;
   --color-in-use: #ffd54f;
   --color-offline: #996bae;
   --color-car: #231f20;

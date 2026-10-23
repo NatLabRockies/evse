@@ -20,6 +20,7 @@
       <a
         class="flex h-11 min-w-0 flex-col items-center justify-center rounded bg-white text-xs leading-none text-nlr-blue focus-visible:outline-3 focus-visible:outline-offset-1 focus-visible:outline-white"
         [routerLink]="level.link"
+        [attr.aria-label]="level.label + ', ' + level.description"
         [style.--active-background]="level.colors.background"
         [style.--active-foreground]="level.colors.foreground"
         routerLinkActive="is-active"
@@ -36,7 +37,7 @@
               <path [attr.d]="wheelchairIcon.path" />
             </svg>
           }
-          <strong class="level-count text-lg leading-none font-black text-available">
+          <strong class="level-count text-lg leading-none font-black text-available-text">
             {{ level.available ?? '—' }}
           </strong>
         </span>

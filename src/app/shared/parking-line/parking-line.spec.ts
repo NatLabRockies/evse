@@ -5,11 +5,16 @@ import {
   createEvseAvailabilityStub,
   provideEvseAvailabilityStub,
 } from '../../testing/evse-availability.stub'
-import { ParkingLine, ParkingLineOrientation, formatElapsedTime } from './parking-line'
+import {
+  ParkingLine,
+  ParkingLineOrientation,
+  describeElapsedTime,
+  formatElapsedTime,
+} from './parking-line'
+
+const MINUTE = 60_000
 
 describe('formatElapsedTime', () => {
-  const MINUTE = 60_000
-
   it.each([
     [0, '0m'],
     [59_999, '0m'],
@@ -20,6 +25,21 @@ describe('formatElapsedTime', () => {
     [-5 * MINUTE, '0m'],
   ])('formats %i ms as %s', (elapsed, expected) => {
     expect(formatElapsedTime(1_000_000, 1_000_000 + elapsed)).toBe(expected)
+  })
+})
+
+describe('describeElapsedTime', () => {
+  it.each([
+    [0, 'less than a minute'],
+    [59_999, 'less than a minute'],
+    [MINUTE, '1 minute'],
+    [7 * MINUTE, '7 minutes'],
+    [60 * MINUTE, '1 hour'],
+    [63 * MINUTE, '1 hour 3 minutes'],
+    [26 * 60 * MINUTE + 30 * MINUTE, '26 hours 30 minutes'],
+    [-5 * MINUTE, 'less than a minute'],
+  ])('describes %i ms as %s', (elapsed, expected) => {
+    expect(describeElapsedTime(1_000_000, 1_000_000 + elapsed)).toBe(expected)
   })
 })
 
@@ -64,9 +84,9 @@ describe('ParkingLine', () => {
       'non-charging',
       'loading',
     ])
-    expect(spaces.map((space) => space.getAttribute('aria-label'))).toEqual([
+    expect(spaces.map((space) => space.textContent?.trim())).toEqual([
       'LV22-01: available',
-      'LV21-01: in use',
+      'LV21-01: in use for 1 hour 3 minutes',
       'LV23-01: offline',
       'Center East space 4: no charger',
       'LV99-01: loading',
@@ -84,11 +104,13 @@ describe('ParkingLine', () => {
     expect(charging.getAttribute('title')).toBe('1h 3m')
     expect(occupied.querySelector('.car-icon')).toBeTruthy()
     expect(occupied.hasAttribute('title')).toBe(false)
+    expect(occupied.textContent?.trim()).toBe('LV22-20: in use')
 
     availability.currentTime.set(new Date('2026-08-05T02:00:00-06:00'))
     await fixture.whenStable()
 
     expect(charging.getAttribute('title')).toBe('1h 58m')
+    expect(charging.textContent?.trim()).toBe('LV21-01: in use for 1 hour 58 minutes')
   })
 
   it('lays cars across vertical lines and along horizontal ones', async () => {
@@ -112,7 +134,7 @@ describe('ParkingLine', () => {
 
     expect(fixture.nativeElement.style.getPropertyValue('--space-count')).toBe('3')
     expect(spaces[1].querySelector('.wheelchair-icon')).toBeTruthy()
-    expect(spaces[1].getAttribute('aria-label')).toBe('LV22-19: available, accessible')
+    expect(spaces[1].textContent?.trim()).toBe('LV22-19: available, accessible')
     expect(spaces[2].querySelector('.wheelchair-icon')).toBeNull()
     expect(spaces[2].querySelector('.car-icon')).toBeTruthy()
   })

@@ -5,7 +5,7 @@ import { RouterLink } from '@angular/router'
 import { Campus, campusName } from '../../../campus-selection.service'
 import { ChargerStatus, EvseAvailabilityService } from '../../../evse-availability.service'
 import { areaLink } from '../../../garage-levels'
-import { accentColors } from '../../../shared/accent'
+import { accentColors, availabilityText } from '../../../shared/accent'
 import { WHEELCHAIR_ICON } from '../../../shared/icons'
 
 /** A place the visitor can go to charge: a garage level at STM or a lot region at Flatirons. */
@@ -31,6 +31,7 @@ export class CampusAvailability {
 
   protected readonly wheelchairIcon = WHEELCHAIR_ICON
   protected readonly accentColors = accentColors
+  protected readonly availabilityText = availabilityText
   protected readonly campusName = computed(() => campusName(this.campus()))
   protected readonly destinations = computed((): readonly Destination[] =>
     this.campus() === 'stm'

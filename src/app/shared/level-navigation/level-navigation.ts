@@ -3,7 +3,7 @@ import { RouterLink, RouterLinkActive } from '@angular/router'
 
 import { EvseAvailabilityService } from '../../evse-availability.service'
 import { areaLink } from '../../garage-levels'
-import { accentColors } from '../accent'
+import { accentColors, availabilityText } from '../accent'
 import { WHEELCHAIR_ICON } from '../icons'
 
 @Component({
@@ -25,6 +25,7 @@ export class LevelNavigation {
       ? this.availabilityService.chargerLevels().map((level) => ({
           ...level,
           colors: accentColors(level.accent),
+          description: availabilityText(level.available, level.accent, level.accessible),
           link: this.mapView() ? areaLink(level.level, 'map') : areaLink(level.level),
         }))
       : [],

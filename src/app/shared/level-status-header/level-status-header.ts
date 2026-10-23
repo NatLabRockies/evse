@@ -3,7 +3,7 @@ import { RouterLink } from '@angular/router'
 
 import { EvseAvailabilityService } from '../../evse-availability.service'
 import { ParkingArea } from '../../garage-levels'
-import { accentColors } from '../accent'
+import { accentColors, availabilityText } from '../accent'
 import { WHEELCHAIR_ICON } from '../icons'
 
 @Component({
@@ -15,6 +15,8 @@ export class LevelStatusHeader {
   readonly level = input.required<ParkingArea>()
   readonly actionLabel = input.required<string>()
   readonly actionLink = input.required<readonly (string | number)[]>()
+  /** When set, the heading tells screen readers that this is the area's map view. */
+  readonly mapView = input(false)
 
   private readonly availabilityService = inject(EvseAvailabilityService)
 
@@ -34,5 +36,9 @@ export class LevelStatusHeader {
         accessible: false,
       }
     )
+  })
+  protected readonly statusText = computed(() => {
+    const { available, accent, accessible } = this.status()
+    return availabilityText(available, accent, accessible)
   })
 }

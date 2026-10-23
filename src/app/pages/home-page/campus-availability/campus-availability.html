@@ -6,9 +6,15 @@
       <a
         class="grid h-16 grid-cols-[2rem_minmax(0,1fr)] overflow-hidden rounded-lg bg-white text-nlr-blue transition-transform hover:-translate-y-0.5 focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-white active:translate-y-0 sm:h-20 sm:grid-cols-[2.5rem_minmax(0,1fr)] sm:rounded-xl"
         [routerLink]="destination.link"
+        [attr.aria-label]="
+          destination.label +
+          ', ' +
+          availabilityText(destination.available, destination.accent, destination.accessible)
+        "
       >
         <span
           [style.background-color]="accentColors(destination.accent).background"
+          [style.background-image]="accentColors(destination.accent).pattern"
           aria-hidden="true"
         ></span>
 
@@ -24,8 +30,7 @@
               class="absolute right-22 size-9 text-nlr-blue min-[390px]:right-25 sm:right-22"
               [attr.viewBox]="wheelchairIcon.viewBox"
               fill="currentColor"
-              role="img"
-              aria-label="Accessible charging"
+              aria-hidden="true"
             >
               <path fill="currentColor" [attr.d]="wheelchairIcon.path" />
             </svg>
@@ -33,11 +38,6 @@
 
           <strong
             class="absolute right-8 text-right text-[2.5rem] leading-none font-black max-[390px]:right-5 sm:right-7 sm:text-[2.75rem]"
-            [attr.aria-label]="
-              destination.available === null
-                ? 'Availability loading'
-                : destination.available + ' available'
-            "
           >
             {{ destination.available ?? '—' }}
           </strong>
@@ -55,36 +55,36 @@
     <time [attr.datetime]="updated.toISOString()" [title]="updated | date: 'medium'">
       {{ lastUpdatedRelative() }}
     </time>
-    @if (hasError()) {
-      <span class="sr-only">The latest refresh failed. Retrying automatically.</span>
-    }
-  } @else if (hasError()) {
-    Data unavailable. Retrying&hellip;
-  } @else if (isLoading()) {
+  } @else if (isLoading() && !hasError()) {
     Loading current data&hellip;
   }
+  <!-- Kept in the page so screen readers announce refresh failures as they happen. -->
+  <span role="status" [class.sr-only]="lastUpdated()">
+    @if (hasError()) {
+      @if (lastUpdated()) {
+        The latest refresh failed. Retrying automatically.
+      } @else {
+        Data unavailable. Retrying&hellip;
+      }
+    }
+  </span>
 </p>
 
-<dl
-  class="mt-3.5 grid grid-cols-3 gap-3 min-[390px]:gap-8 sm:mt-5 sm:gap-8"
-  aria-label="Charger status summary"
->
-  @for (stat of chargerSummary(); track stat.label) {
-    <div class="overflow-hidden rounded-lg border-2 border-nlr-blue text-center sm:rounded-xl">
-      <div
-        class="h-7 sm:h-8"
-        [class.bg-available]="stat.accent === 'available'"
-        [class.bg-in-use]="stat.accent === 'in-use'"
-        [class.bg-offline]="stat.accent === 'offline'"
-        aria-hidden="true"
-      ></div>
+<h2 class="sr-only">Charger status summary</h2>
 
-      <div class="flex flex-col-reverse px-1 py-3 font-condensed sm:py-4">
-        <dt class="text-lg leading-6 font-bold sm:text-xl">Total<br />{{ stat.label }}</dt>
-        <dd class="text-4xl leading-none font-bold sm:text-[3rem]">
-          {{ stat.count ?? '—' }}
-        </dd>
-      </div>
+<dl class="mt-3.5 grid grid-cols-3 gap-3 min-[390px]:gap-8 sm:mt-5 sm:gap-8">
+  @for (stat of chargerSummary(); track stat.label) {
+    <!-- The color bar is a pseudo-element because a dl group may only contain dt and dd. -->
+    <div
+      class="flex flex-col overflow-hidden rounded-lg border-2 border-nlr-blue pb-3 text-center font-condensed before:mb-3 before:h-7 before:bg-(--stat-color) sm:rounded-xl sm:pb-4 sm:before:mb-4 sm:before:h-8"
+      [style.--stat-color]="accentColors(stat.accent).background"
+    >
+      <dt class="order-1 px-1 text-lg leading-6 font-bold sm:text-xl">
+        Total <br />{{ stat.label }}
+      </dt>
+      <dd class="px-1 text-4xl leading-none font-bold sm:text-[3rem]">
+        {{ stat.count ?? '—' }}
+      </dd>
     </div>
   }
 </dl>

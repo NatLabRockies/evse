@@ -6,19 +6,20 @@
 >
   <div class="mx-auto max-w-3xl">
     <div class="grid grid-cols-[auto_minmax(6.5rem,1fr)_auto] items-center gap-2">
-      <h1 class="text-[clamp(1.25rem,6vw,1.625rem)] leading-none font-bold whitespace-nowrap">
+      <h1
+        class="text-[clamp(1.25rem,6vw,1.625rem)] leading-none font-bold whitespace-nowrap outline-none"
+        tabindex="-1"
+      >
         {{ level() === 'fc' ? 'Flatirons' : 'LEVEL ' + level() }}
+        @if (mapView()) {
+          <span class="sr-only">map</span>
+        }
       </h1>
 
       <div
         class="mx-auto flex min-w-0 items-center justify-center gap-2 rounded-lg px-3 py-1"
         [style.background-color]="colors.background"
         [style.color]="colors.foreground"
-        [attr.aria-label]="
-          currentStatus.available === null
-            ? 'Availability loading'
-            : currentStatus.available + ' available'
-        "
       >
         @if (currentStatus.accessible) {
           <svg
@@ -30,25 +31,28 @@
             <path [attr.d]="wheelchairIcon.path" />
           </svg>
         }
-        <strong class="text-[2rem] leading-none font-black">
+        <strong class="text-[2rem] leading-none font-black" aria-hidden="true">
           {{ currentStatus.available ?? '—' }}
         </strong>
-        <span class="text-[clamp(0.875rem,4vw,1.125rem)] leading-none whitespace-nowrap">
+        <span
+          class="text-[clamp(0.875rem,4vw,1.125rem)] leading-none whitespace-nowrap"
+          aria-hidden="true"
+        >
           Available
         </span>
+        <span class="sr-only">{{ statusText() }}</span>
       </div>
 
       <dl class="grid gap-0.5 text-[clamp(0.8rem,3.8vw,1rem)] leading-none">
         <div class="flex items-center gap-1.5">
           <dt class="order-2">In Use</dt>
-          <dd class="h-3.5 w-8 rounded bg-in-use" aria-label="Gold"></dd>
+          <dd class="h-3.5 w-8 rounded bg-in-use"><span class="sr-only">Gold</span></dd>
         </div>
         <div class="flex items-center gap-1.5">
           <dt class="order-2">Offline</dt>
-          <dd
-            class="h-3.5 w-8 rounded bg-offline [background-image:var(--offline-cross-image)]"
-            aria-label="Purple with an X"
-          ></dd>
+          <dd class="h-3.5 w-8 rounded bg-offline [background-image:var(--offline-cross-image)]">
+            <span class="sr-only">Purple with an X</span>
+          </dd>
         </div>
       </dl>
     </div>

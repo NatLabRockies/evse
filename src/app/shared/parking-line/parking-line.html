@@ -17,8 +17,8 @@
       [attr.data-parking-space]="parkingSpace"
       [attr.data-status]="status"
       [attr.title]="status === 'in-use' ? carTitle(parkingSpace) : null"
-      [attr.aria-label]="spaceLabel(parkingSpace, $index)"
     >
+      <span class="sr-only">{{ spaceLabel(parkingSpace, $index) }}</span>
       @if (status === 'in-use') {
         <svg class="car-icon" [attr.viewBox]="carIcon().viewBox" aria-hidden="true">
           <path fill="currentColor" [attr.d]="carIcon().path" />

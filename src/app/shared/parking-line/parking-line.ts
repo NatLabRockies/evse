@@ -1,4 +1,5 @@
 import { Component, computed, inject, input } from '@angular/core'
+import { formatDuration } from 'date-fns'
 
 import { ChargerStatus, EvseAvailabilityService } from '../../evse-availability.service'
 import { CAR_HORIZONTAL_ICON, CAR_VERTICAL_ICON, WHEELCHAIR_ICON } from '../icons'
@@ -6,16 +7,24 @@ import { CAR_HORIZONTAL_ICON, CAR_VERTICAL_ICON, WHEELCHAIR_ICON } from '../icon
 export type ParkingLineOrientation = 'horizontal' | 'vertical'
 export type ParkingSpaceId = string | null
 
-export function formatElapsedTime(startTime: number, currentTime: number): string {
+const elapsedHoursAndMinutes = (startTime: number, currentTime: number) => {
   const totalMinutes = Math.max(0, Math.floor((currentTime - startTime) / 60_000))
-  const hours = Math.floor(totalMinutes / 60)
-  const minutes = totalMinutes % 60
+  return { hours: Math.floor(totalMinutes / 60), minutes: totalMinutes % 60 }
+}
+
+export function formatElapsedTime(startTime: number, currentTime: number): string {
+  const { hours, minutes } = elapsedHoursAndMinutes(startTime, currentTime)
 
   if (!hours) {
     return `${minutes}m`
   }
 
   return minutes ? `${hours}h ${minutes}m` : `${hours}h`
+}
+
+/** The elapsed time spelled out, e.g. "1 hour 3 minutes", for screen readers. */
+export function describeElapsedTime(startTime: number, currentTime: number): string {
+  return formatDuration(elapsedHoursAndMinutes(startTime, currentTime)) || 'less than a minute'
 }
 
 @Component({
@@ -60,8 +69,14 @@ export class ParkingLine {
 
     const status = this.statusFor(parkingSpace)
     const statusLabel = status === 'in-use' ? 'in use' : status
+    // Spell out the elapsed time that sighted mouse users see in the space's tooltip.
+    const startTime = status === 'in-use' ? this.sessionStartTimes()[parkingSpace] : undefined
+    const elapsedLabel =
+      startTime === undefined
+        ? ''
+        : ` for ${describeElapsedTime(startTime, this.currentTime().getTime())}`
     const accessibleLabel = this.accessible() ? ', accessible' : ''
-    return `${parkingSpace}: ${statusLabel}${accessibleLabel}`
+    return `${parkingSpace}: ${statusLabel}${elapsedLabel}${accessibleLabel}`
   }
 
   protected carTitle(parkingSpace: ParkingSpaceId): string | null {

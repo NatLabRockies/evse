@@ -1,17 +1,21 @@
 import { TestBed } from '@angular/core/testing'
 import { provideRouter } from '@angular/router'
+import { vi } from 'vitest'
 
-import { CampusSelectionService } from '../../campus-selection.service'
+import { CAMPUS_STORAGE_KEY, CampusSelectionService } from '../../campus-selection.service'
 import {
   createEvseAvailabilityStub,
   provideEvseAvailabilityStub,
 } from '../../testing/evse-availability.stub'
+import { stubLocalStorage } from '../../testing/local-storage.stub'
 import { HomePage } from './home-page'
 
 describe('HomePage', () => {
   const availability = createEvseAvailabilityStub()
+  let storage: Storage
 
   beforeEach(() => {
+    storage = stubLocalStorage()
     TestBed.configureTestingModule({
       providers: [provideRouter([]), provideEvseAvailabilityStub(availability)],
     })
@@ -30,7 +34,7 @@ describe('HomePage', () => {
     }
   }
 
-  afterEach(() => localStorage.clear())
+  afterEach(() => vi.restoreAllMocks())
 
   it('presents the campuses as an accessible tab list with one rendered panel', async () => {
     const { tabList, tabs, panels } = await render()
@@ -76,7 +80,7 @@ describe('HomePage', () => {
   })
 
   it('opens on the remembered campus', async () => {
-    localStorage.setItem('evse-campus', 'flatirons')
+    storage.setItem(CAMPUS_STORAGE_KEY, 'flatirons')
     const { tabs, panels } = await render()
 
     expect(tabs()[1].getAttribute('aria-selected')).toBe('true')
@@ -88,13 +92,16 @@ describe('HomePage', () => {
     availability.isLoading.set(true)
     const { fixture, host } = await render()
     const status = () => host.querySelector('p')?.textContent?.replace(/\s+/g, ' ').trim()
+    const announcement = () => host.querySelector('[role="status"]')?.textContent?.trim()
 
     expect(status()).toBe('Loading current data…')
+    expect(announcement()).toBe('')
 
     availability.isLoading.set(false)
     availability.hasError.set(true)
     await fixture.whenStable()
     expect(status()).toBe('Data unavailable. Retrying…')
+    expect(announcement()).toBe('Data unavailable. Retrying…')
 
     availability.lastUpdated.set(new Date('2026-08-05T01:05:00-06:00'))
     availability.lastUpdatedRelative.set('2 minutes ago')
@@ -102,5 +109,7 @@ describe('HomePage', () => {
     expect(status()).toBe(
       'Updated 2 minutes ago The latest refresh failed. Retrying automatically.',
     )
+    expect(announcement()).toBe('The latest refresh failed. Retrying automatically.')
+    expect(host.querySelector('[role="status"]')?.classList).toContain('sr-only')
   })
 })

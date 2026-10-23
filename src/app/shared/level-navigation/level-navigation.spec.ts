@@ -44,6 +44,13 @@ describe('LevelNavigation', () => {
       '0',
     ])
     expect(links.map((link) => link.querySelectorAll('svg').length)).toEqual([1, 0, 0, 1, 0])
+    expect(links.map((link) => link.getAttribute('aria-label'))).toEqual([
+      null,
+      'Level 1, 5 available',
+      'Level 2, 14 available',
+      'Level 3, 2 available, accessible charging',
+      'Level 4, 0 available, all offline',
+    ])
     expect(links[4].style.getPropertyValue('--active-background')).toBe('var(--color-offline)')
   })
 

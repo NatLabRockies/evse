@@ -30,7 +30,7 @@
           },
           "configurations": {
             "production": {
-              "baseHref": "/evse/",
+              "baseHref": "/intelligent-campus/evse/",
               "serviceWorker": "ngsw-config.json",
               "budgets": [
                 {

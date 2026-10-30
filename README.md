@@ -33,6 +33,21 @@ pnpm test
 pnpm build
 ```
 
+### Deployment builds
+
+| Environment | Command              | Site URL                                                            | Output directory                         |
+| ----------- | -------------------- | ------------------------------------------------------------------- | ---------------------------------------- |
+| Production  | `pnpm build`         | `https://widgets.nlr.gov/intelligent-campus/evse/`                  | `dist/evse-dashboard/production/browser` |
+| Staging     | `pnpm build:staging` | `https://widgets-stage.tada-stage.nlr.gov/intelligent-campus/evse/` | `dist/evse-dashboard/staging/browser`    |
+
+Both builds use `/intelligent-campus/evse/` as the base path and generate absolute canonical and
+social-preview URLs before service-worker hashing. Staging is public, so its build also adds
+`<meta name="robots" content="noindex">` to keep it out of search results; never deploy the
+staging output to production. Serve the chosen output directory at that
+path, with unmatched app routes falling back to its `index.html`. Local development stays at `/`.
+CI tests and builds both environments and uploads the `evse-dashboard` artifact; deployment is
+handled separately.
+
 ### Storybook
 
 Each component has stories next to it (`*.stories.ts`) for its visual states. They get their

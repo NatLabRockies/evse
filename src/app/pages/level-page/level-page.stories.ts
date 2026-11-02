@@ -7,6 +7,7 @@ import {
   atUrl,
   onViewport,
   withAvailability,
+  withEmbedded,
 } from '../../testing/storybook'
 import { LevelPage } from './level-page'
 
@@ -45,3 +46,15 @@ export const Level4Desktop: Story = area(4, 'desktop')
 /** The Flatirons lot links only to the home page. */
 export const Flatirons: Story = area('fc', 'mobile')
 export const FlatironsDesktop: Story = area('fc', 'desktop')
+
+const embedded = (level: ParkingArea, viewport: StoryViewport): Story => ({
+  ...area(level, viewport),
+  beforeEach: withEmbedded,
+})
+
+/** In another page's iframe, the page fills the frame the embedding page gives it. */
+export const EmbeddedLevel2: Story = embedded(2, 'embeddedPhone')
+export const EmbeddedLevel2Desktop: Story = embedded(2, 'embeddedDesktop')
+
+/** The status header tightens to fit the narrowest columns, with its longest heading here. */
+export const EmbeddedFlatironsNarrow: Story = embedded('fc', 'embeddedNarrow')

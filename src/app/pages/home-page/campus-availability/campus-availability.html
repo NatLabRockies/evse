@@ -27,7 +27,7 @@
 
           @if (destination.accessible) {
             <svg
-              class="absolute right-22 size-9 text-nlr-blue min-[390px]:right-25 sm:right-22"
+              class="absolute right-22 size-9 text-nlr-blue min-[390px]:right-25 sm:right-22 embedded:max-[19.5rem]:right-12"
               [attr.viewBox]="wheelchairIcon.viewBox"
               fill="currentColor"
               aria-hidden="true"
@@ -48,7 +48,7 @@
 </ul>
 
 <p
-  class="mt-4.5 text-center text-xl leading-7 font-normal whitespace-nowrap font-condensed sm:mt-6 sm:text-2xl"
+  class="mt-4.5 text-center text-xl leading-7 font-normal whitespace-nowrap font-condensed sm:mt-6 sm:text-2xl embedded:max-[19.5rem]:whitespace-normal"
 >
   @if (lastUpdated(); as updated) {
     Updated
@@ -72,14 +72,18 @@
 
 <h2 class="sr-only">Charger status summary</h2>
 
-<dl class="mt-3.5 grid grid-cols-3 gap-3 min-[390px]:gap-8 sm:mt-5 sm:gap-8">
+<dl
+  class="mt-3.5 grid grid-cols-3 gap-3 min-[390px]:gap-8 sm:mt-5 sm:gap-8 embedded:max-[19.5rem]:gap-2"
+>
   @for (stat of chargerSummary(); track stat.label) {
     <!-- The color bar is a pseudo-element because a dl group may only contain dt and dd. -->
     <div
       class="flex flex-col overflow-hidden rounded-lg border-2 border-nlr-blue pb-3 text-center font-condensed before:mb-3 before:h-7 before:bg-(--stat-color) sm:rounded-xl sm:pb-4 sm:before:mb-4 sm:before:h-8"
       [style.--stat-color]="accentColors(stat.accent).background"
     >
-      <dt class="order-1 px-1 text-lg leading-6 font-bold sm:text-xl">
+      <dt
+        class="order-1 px-1 text-lg leading-6 font-bold sm:text-xl embedded:max-[19.5rem]:text-base embedded:max-[17rem]:text-[0.9375rem]"
+      >
         Total <br />{{ stat.label }}
       </dt>
       <dd class="px-1 text-4xl leading-none font-bold sm:text-[3rem]">

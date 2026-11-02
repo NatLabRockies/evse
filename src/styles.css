@@ -18,10 +18,25 @@
   font-stretch: 70%;
 }
 
-@custom-variant standalone (@media (display-mode: standalone));
+/* Set on <html> by main.ts when the app is shown inside another page's iframe. */
+@custom-variant embedded (&:where([data-embedded], [data-embedded] *));
+
+/* A framed page reports the embedding page's display mode, so leave out embedded copies. */
+@custom-variant standalone {
+  @media (display-mode: standalone) {
+    &:where(:not([data-embedded], [data-embedded] *)) {
+      @slot;
+    }
+  }
+}
 
 :root {
   --app-height: 100dvh;
+  /* iOS passes the embedding page's safe-area insets into frames, so embedded copies ignore them. */
+  --safe-area-top: env(safe-area-inset-top);
+  --safe-area-right: env(safe-area-inset-right);
+  --safe-area-bottom: env(safe-area-inset-bottom);
+  --safe-area-left: env(safe-area-inset-left);
   --offline-cross-image:
     linear-gradient(
       to bottom right,
@@ -35,6 +50,13 @@
       var(--color-nlr-navy) 50%,
       transparent calc(50% + 1px)
     );
+}
+
+:root[data-embedded] {
+  --safe-area-top: 0px;
+  --safe-area-right: 0px;
+  --safe-area-bottom: 0px;
+  --safe-area-left: 0px;
 }
 
 @layer base {

@@ -41,6 +41,9 @@ __screenshots__/
 /.storybook/screenshots/*
 !/.storybook/screenshots/linux/
 
+# Local harness for reviewing the dashboard embedded in the NLR EV charging page
+/embed-review/
+
 # System files
 .DS_Store
 Thumbs.db

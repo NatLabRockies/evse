@@ -2,7 +2,13 @@ import { Meta, StoryObj } from '@storybook/angular-vite'
 import { expect } from 'storybook/test'
 
 import { CAMPUS_STORAGE_KEY } from '../../campus-selection.service'
-import { NO_DATA, onViewport, withAvailability, withCampus } from '../../testing/storybook'
+import {
+  NO_DATA,
+  onViewport,
+  withAvailability,
+  withCampus,
+  withEmbedded,
+} from '../../testing/storybook'
 import { HomePage } from './home-page'
 
 const meta: Meta<HomePage> = {
@@ -52,4 +58,27 @@ export const StmDesktop: Story = { globals: onViewport('desktop') }
 export const FlatironsDesktop: Story = {
   beforeEach: withCampus('flatirons'),
   globals: onViewport('desktop'),
+}
+
+/** In another page's iframe, the page starts at the campus tabs below that page's own branding. */
+export const Embedded: Story = {
+  beforeEach: withEmbedded,
+  globals: onViewport('embeddedPhone'),
+  play: async ({ canvas }) => {
+    await expect(canvas.getByRole('heading', { level: 1, name: 'FIND A CHARGER' })).toBeTruthy()
+    await expect(
+      canvas.queryByRole('img', { name: 'National Laboratory of the Rockies' }),
+    ).toBeNull()
+  },
+}
+
+/** A 320px-wide phone leaves a 260px column for the frame. */
+export const EmbeddedNarrow: Story = {
+  beforeEach: withEmbedded,
+  globals: onViewport('embeddedNarrow'),
+}
+
+export const EmbeddedDesktop: Story = {
+  beforeEach: withEmbedded,
+  globals: onViewport('embeddedDesktop'),
 }

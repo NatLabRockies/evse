@@ -2,3 +2,8 @@
   display: block;
   min-width: 20rem;
 }
+
+/* The embedding page's column is narrower than the phone it is on. */
+:host-context([data-embedded]) {
+  min-width: 0;
+}

@@ -13,7 +13,7 @@
           "/favicon.svg",
           "/icon-192.png",
           "/icon-512.png",
-          "/nlr-logo.svg",
+          "/media/nlr-logo-*.svg",
           "/*.css",
           "/*.js"
         ]
@@ -24,7 +24,7 @@
       "installMode": "lazy",
       "updateMode": "prefetch",
       "resources": {
-        "files": ["/levels/*.svg"]
+        "files": ["/media/fc-*.svg", "/media/level-*.svg"]
       }
     }
   ]

@@ -30,6 +30,22 @@ export const STORY_VIEWPORTS = {
     styles: { width: '1280px', height: '800px' },
     type: 'desktop',
   },
+  // The iframe sizes on the NLR EV charging page, measured with the embed review harness.
+  embeddedPhone: {
+    name: 'Embedded on a phone',
+    styles: { width: '333px', height: '659px' },
+    type: 'mobile',
+  },
+  embeddedNarrow: {
+    name: 'Embedded on a 320px-wide phone',
+    styles: { width: '260px', height: '656px' },
+    type: 'mobile',
+  },
+  embeddedDesktop: {
+    name: 'Embedded on a desktop',
+    styles: { width: '827px', height: '752px' },
+    type: 'desktop',
+  },
 } as const
 
 export type StoryViewport = keyof typeof STORY_VIEWPORTS
@@ -47,6 +63,14 @@ export const atUrl = (url: string): Decorator =>
   applicationConfig({
     providers: [provideAppInitializer(() => inject(Router).navigateByUrl(url))],
   })
+
+/** Shows the embedded view, by marking the page as `main.ts` does when the app is framed. */
+export const withEmbedded = () => {
+  document.documentElement.dataset['embedded'] = ''
+  return () => {
+    delete document.documentElement.dataset['embedded']
+  }
+}
 
 /** Makes the home page open on `campus`, restoring the browser's stored choice afterward. */
 export const withCampus = (campus: Campus) => () => {

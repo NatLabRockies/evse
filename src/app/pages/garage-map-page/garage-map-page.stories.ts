@@ -7,6 +7,7 @@ import {
   atUrl,
   onViewport,
   withAvailability,
+  withEmbedded,
 } from '../../testing/storybook'
 import { GarageMapPage } from './garage-map-page'
 
@@ -45,3 +46,12 @@ export const Level4Desktop: Story = area(4, 'desktop')
 export const Flatirons: Story = area('fc', 'mobile')
 export const FlatironsLandscape: Story = area('fc', 'mobileLandscape')
 export const FlatironsDesktop: Story = area('fc', 'desktop')
+
+const embedded = (level: ParkingArea, viewport: StoryViewport): Story => ({
+  ...area(level, viewport),
+  beforeEach: withEmbedded,
+})
+
+/** A phone's frame is taller than it is wide, so the plan turns sideways as it does full screen. */
+export const EmbeddedLevel2: Story = embedded(2, 'embeddedPhone')
+export const EmbeddedLevel2Desktop: Story = embedded(2, 'embeddedDesktop')

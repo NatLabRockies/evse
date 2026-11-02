@@ -5,8 +5,6 @@ export default defineMain({
   framework: '@storybook/angular-vite',
   stories: ['../src/**/*.stories.ts'],
   addons: ['@storybook/addon-a11y', '@storybook/addon-vitest'],
-  // The maps load from levels/*.svg and the home page logo from nlr-logo.svg.
-  staticDirs: ['../public'],
   core: { disableTelemetry: true },
   viteFinal: (config) =>
     mergeConfig(config, {

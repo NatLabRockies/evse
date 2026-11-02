@@ -1,5 +1,6 @@
 import { TabsHarness } from '@angular/aria/tabs/testing'
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed'
+import { PlatformLocation } from '@angular/common'
 import { provideHttpClient } from '@angular/common/http'
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
@@ -7,8 +8,10 @@ import { Router, provideRouter, withComponentInputBinding } from '@angular/route
 import { vi } from 'vitest'
 
 import { App } from './app'
+import { embeddedConfig } from './app.config'
 import { routes } from './app.routes'
 import { CAMPUS_STORAGE_KEY } from './campus-selection.service'
+import { svgUrl } from './shared/garage-level-map/garage-level-svg.service'
 import {
   createEvseAvailabilityStub,
   provideEvseAvailabilityStub,
@@ -83,11 +86,14 @@ describe('App routing', () => {
 
     expect(document.activeElement).toBe(document.body)
 
+    const pushState = vi.spyOn(TestBed.inject(PlatformLocation), 'pushState')
     await TestBed.inject(Router).navigateByUrl('/level/2')
     await fixture.whenStable()
 
     expect(document.activeElement).toBe(compiled.querySelector('h1'))
     expect(document.activeElement?.textContent).toContain('LEVEL 2')
+    // Direct visits keep their history, so Back returns to the previous page.
+    expect(pushState).toHaveBeenCalledWith(expect.anything(), '', '/level/2')
   })
 
   it('renders the level overview with live parking spaces', async () => {
@@ -263,6 +269,30 @@ describe('App routing', () => {
     expect(compiled.querySelector('h1')?.textContent).toContain('FIND A CHARGER')
   })
 
+  describe('when embedded in another page', () => {
+    beforeEach(() => {
+      TestBed.configureTestingModule({ providers: embeddedConfig.providers })
+    })
+
+    it('navigates without adding history entries or scrolling the embedding page', async () => {
+      const scrollTo = vi.spyOn(window, 'scrollTo').mockReturnValue(undefined)
+      const focus = vi.spyOn(HTMLElement.prototype, 'focus')
+      const { fixture, compiled } = await renderRoute('/level/1')
+      const platformLocation = TestBed.inject(PlatformLocation)
+      const pushState = vi.spyOn(platformLocation, 'pushState')
+      const replaceState = vi.spyOn(platformLocation, 'replaceState')
+
+      await TestBed.inject(Router).navigateByUrl('/level/2')
+      await fixture.whenStable()
+
+      expect(replaceState).toHaveBeenCalledWith(expect.anything(), '', '/level/2')
+      expect(pushState).not.toHaveBeenCalled()
+      expect(document.activeElement).toBe(compiled.querySelector('h1'))
+      expect(focus).toHaveBeenLastCalledWith({ preventScroll: true })
+      expect(scrollTo).toHaveBeenCalledWith(0, 0)
+    })
+  })
+
   async function renderRoute(
     url: string,
   ): Promise<{ fixture: ComponentFixture<App>; compiled: HTMLElement }> {
@@ -272,10 +302,10 @@ describe('App routing', () => {
     TestBed.tick()
 
     const mapRequests = TestBed.inject(HttpTestingController)
-      .match((request) => request.url.startsWith('levels/'))
+      .match((request) => request.url.endsWith('.svg'))
       .filter((request) => !request.cancelled)
     for (const request of mapRequests) {
-      request.flush(request.request.url === 'levels/fc.svg' ? TEST_FC_SVG : TEST_MAP_SVG)
+      request.flush(request.request.url === svgUrl('fc') ? TEST_FC_SVG : TEST_MAP_SVG)
     }
 
     await fixture.whenStable()

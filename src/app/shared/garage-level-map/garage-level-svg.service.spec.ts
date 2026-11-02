@@ -6,11 +6,13 @@ import { vi } from 'vitest'
 import { GarageLevelSvgService, svgUrl } from './garage-level-svg.service'
 
 const SVG = '<svg xmlns="http://www.w3.org/2000/svg"></svg>'
+const FC_URL = svgUrl('fc')
 
 describe('svgUrl', () => {
-  it('maps parking areas to their SVG files', () => {
-    expect(svgUrl('fc')).toBe('levels/fc.svg')
-    expect(svgUrl(3)).toBe('levels/level-3.svg')
+  it('maps parking areas to their SVG files under media/', () => {
+    // Production builds add a content hash to each name, e.g. media/level-3-OAVYXMEZ.svg.
+    expect(svgUrl('fc')).toMatch(/(^|\/)media\/fc(-[A-Z0-9]+)?\.svg$/)
+    expect(svgUrl(3)).toMatch(/(^|\/)media\/level-3(-[A-Z0-9]+)?\.svg$/)
   })
 })
 
@@ -44,11 +46,11 @@ describe('GarageLevelSvgService', () => {
     const requests = httpTesting.match(() => true)
 
     expect(requests.map((request) => request.request.url)).toEqual([
-      'levels/level-1.svg',
-      'levels/level-2.svg',
-      'levels/level-3.svg',
-      'levels/level-4.svg',
-      'levels/fc.svg',
+      svgUrl(1),
+      svgUrl(2),
+      svgUrl(3),
+      svgUrl(4),
+      FC_URL,
     ])
     expect(service.isLoading(2)).toBe(true)
     expect(service.sourceFor(2)).toBe('')
@@ -59,44 +61,42 @@ describe('GarageLevelSvgService', () => {
     await settle()
 
     expect(service.isLoading(2)).toBe(false)
-    expect(service.sourceFor(2)).toContain('levels/level-2.svg')
-    expect(service.sourceFor('fc')).toContain('levels/fc.svg')
+    expect(service.sourceFor(2)).toContain(svgUrl(2))
+    expect(service.sourceFor('fc')).toContain(FC_URL)
   })
 
   it('retries a failed map twice, a second apart, before giving up', async () => {
     const fail = (url: string) =>
       httpTesting.expectOne(url).flush('Missing', { status: 404, statusText: 'Not Found' })
 
-    httpTesting.match((request) => request.url !== 'levels/fc.svg').forEach((r) => r.flush(SVG))
-    fail('levels/fc.svg')
+    httpTesting.match((request) => request.url !== FC_URL).forEach((r) => r.flush(SVG))
+    fail(FC_URL)
     await settle()
     expect(service.isLoading('fc')).toBe(false)
 
     await advance(999)
-    httpTesting.expectNone('levels/fc.svg')
+    httpTesting.expectNone(FC_URL)
     await advance(1)
-    fail('levels/fc.svg')
+    fail(FC_URL)
     await settle()
 
     await advance(1_000)
-    httpTesting.expectOne('levels/fc.svg').flush(SVG)
+    httpTesting.expectOne(FC_URL).flush(SVG)
     await settle()
 
     expect(service.sourceFor('fc')).toBe(SVG)
     await advance(5_000)
-    httpTesting.expectNone('levels/fc.svg')
+    httpTesting.expectNone(FC_URL)
   })
 
   it('stops retrying after the second failed retry', async () => {
-    httpTesting.match((request) => request.url !== 'levels/fc.svg').forEach((r) => r.flush(SVG))
+    httpTesting.match((request) => request.url !== FC_URL).forEach((r) => r.flush(SVG))
     for (let attempt = 0; attempt < 3; attempt += 1) {
-      httpTesting
-        .expectOne('levels/fc.svg')
-        .flush('Missing', { status: 404, statusText: 'Not Found' })
+      httpTesting.expectOne(FC_URL).flush('Missing', { status: 404, statusText: 'Not Found' })
       await advance(1_000)
     }
 
-    httpTesting.expectNone('levels/fc.svg')
+    httpTesting.expectNone(FC_URL)
     expect(service.sourceFor('fc')).toBe('')
     expect(service.isLoading('fc')).toBe(false)
   })
